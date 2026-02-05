@@ -41,14 +41,12 @@ export class ImageParticle {
         }
       }
     }
-    // 获取正文图片列表
     getImageList(this.draw.getOriginalMainElementList())
     return imageList
   }
 
   public createFloatImage(element: IElement) {
     const { scale } = this.options
-    // 复用浮动元素
     let floatImageContainer = this.floatImageContainer
     let floatImage = this.floatImage
     if (!floatImageContainer) {
@@ -65,7 +63,6 @@ export class ImageParticle {
     floatImageContainer.style.display = 'none'
     floatImage.style.width = `${element.width! * scale}px`
     floatImage.style.height = `${element.height! * scale}px`
-    // 浮动图片初始信息
     const height = this.draw.getHeight()
     const pageGap = this.draw.getPageGap()
     const preY = this.draw.getPageNo() * (height + pageGap)
@@ -78,7 +75,6 @@ export class ImageParticle {
   public dragFloatImage(movementX: number, movementY: number) {
     if (!this.floatImageContainer) return
     this.floatImageContainer.style.display = 'block'
-    // 之前的坐标加移动长度
     const x = parseFloat(this.floatImageContainer.style.left) + movementX
     const y = parseFloat(this.floatImageContainer.style.top) + movementY
     this.floatImageContainer.style.left = `${x}px`
@@ -170,9 +166,7 @@ export class ImageParticle {
         img.onload = () => {
           this.imageCache.set(element.value, img)
           resolve(element)
-          // 因图片加载异步，图片加载后可能属于上一次渲染方法
           if (cacheRenderCount !== this.draw.getRenderCount()) return
-          // 衬于文字下方图片需要重新首先绘制
           if (element.imgDisplay === ImageDisplay.FLOAT_BOTTOM) {
             this.draw.render({
               isCompute: false,

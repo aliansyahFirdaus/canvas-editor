@@ -111,7 +111,6 @@ export class CanvasEvent {
     const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
     if (isDisabled) return
     let selection = this.range.getSelection()
-    // 当前不存在选区时：判断光标处是否存词组
     if (!selection) {
       const range = getWordRangeBySegmenter(this)
       if (range) {
@@ -128,7 +127,6 @@ export class CanvasEvent {
       })
     })
     this.draw.render({ isSetCursor: false })
-    // 清除格式刷
     const painterOptions = this.draw.getPainterOptions()
     if (!painterOptions || !painterOptions.isDblclick) {
       this.clearPainterStyle()
@@ -136,7 +134,6 @@ export class CanvasEvent {
   }
 
   public selectAll() {
-    // 光标在表格内时选择整个表格
     if (this.position.getPositionContext().isTable) {
       this.draw.getTableOperate().tableSelectAll()
     } else {
@@ -159,7 +156,6 @@ export class CanvasEvent {
   }
 
   public click() {
-    // IOS系统限制非用户主动触发事件的键盘弹出
     if (isIOS && !this.draw.isReadonly()) {
       this.draw.getCursor().getAgentDom().focus()
     }

@@ -1,11 +1,9 @@
 import { CanvasEvent } from '../../CanvasEvent'
 
-// 删除光后前隐藏元素
 function deleteHideElement(host: CanvasEvent) {
   const draw = host.getDraw()
   const rangeManager = draw.getRange()
   const range = rangeManager.getRange()
-  // 光标所在位置为隐藏元素时触发循环删除
   const elementList = draw.getElementList()
   const nextElement = elementList[range.startIndex + 1]
   if (
@@ -15,7 +13,6 @@ function deleteHideElement(host: CanvasEvent) {
   ) {
     return
   }
-  // 向后删除所有隐藏元素
   const index = range.startIndex + 1
   while (index < elementList.length) {
     const element = elementList[index]
@@ -39,20 +36,16 @@ function deleteHideElement(host: CanvasEvent) {
 export function del(evt: KeyboardEvent, host: CanvasEvent) {
   const draw = host.getDraw()
   if (draw.isReadonly()) return
-  // 可输入性验证
   const rangeManager = draw.getRange()
   if (!rangeManager.getIsCanInput()) return
   const { startIndex, endIndex, isCrossRowCol } = rangeManager.getRange()
-  // 隐藏控件删除
   const elementList = draw.getElementList()
   const control = draw.getControl()
   if (rangeManager.getIsCollapsed()) {
     deleteHideElement(host)
   }
-  // 删除操作
   let curIndex: number | null
   if (isCrossRowCol) {
-    // 表格跨行列选中时清空单元格内容
     const rowCol = draw.getTableParticle().getRangeRowCol()
     if (!rowCol) return
     let isDeleted = false
@@ -66,24 +59,19 @@ export function del(evt: KeyboardEvent, host: CanvasEvent) {
         }
       }
     }
-    // 删除成功后定位
     curIndex = isDeleted ? 0 : null
   } else if (control.getActiveControl() && control.getIsRangeWithinControl()) {
-    // 光标在控件内
     curIndex = control.keydown(evt)
     if (curIndex) {
       control.emitControlContentChange()
     }
   } else if (elementList[endIndex + 1]?.controlId) {
-    // 光标在控件前
     curIndex = control.removeControl(endIndex + 1)
   } else {
-    // 普通元素
     const position = draw.getPosition()
     const cursorPosition = position.getCursorPosition()
     if (!cursorPosition) return
     const { index } = cursorPosition
-    // 命中图片直接删除
     const positionContext = position.getPositionContext()
     if (positionContext.isDirectHit && positionContext.isImage) {
       draw.spliceElementList(elementList, index, 1)

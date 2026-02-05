@@ -11,7 +11,6 @@ export class Underline extends AbstractRichText {
     this.options = draw.getOptions()
   }
 
-  // 下划线
   private _drawLine(
     ctx: CanvasRenderingContext2D,
     startX: number,
@@ -23,11 +22,9 @@ export class Underline extends AbstractRichText {
     ctx.beginPath()
     switch (dashType) {
       case DashType.DASHED:
-        // 长虚线- - - - - -
         ctx.setLineDash([3, 1])
         break
       case DashType.DOTTED:
-        // 点虚线 . . . . . .
         ctx.setLineDash([1, 1])
         break
     }
@@ -36,7 +33,6 @@ export class Underline extends AbstractRichText {
     ctx.stroke()
   }
 
-  // 双实线
   private _drawDouble(
     ctx: CanvasRenderingContext2D,
     startX: number,
@@ -56,7 +52,6 @@ export class Underline extends AbstractRichText {
     ctx.stroke()
   }
 
-  // 波浪线
   private _drawWave(
     ctx: CanvasRenderingContext2D,
     startX: number,

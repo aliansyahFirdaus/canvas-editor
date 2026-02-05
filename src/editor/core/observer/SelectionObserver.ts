@@ -3,9 +3,7 @@ import { Draw } from '../draw/Draw'
 import { RangeManager } from '../range/RangeManager'
 
 export class SelectionObserver {
-  // 每次滚动长度
   private readonly step: number = 5
-  // 触发滚动阀值
   private readonly thresholdPoints: [
     top: number,
     down: number,
@@ -24,7 +22,6 @@ export class SelectionObserver {
 
   constructor(draw: Draw) {
     this.rangeManager = draw.getRange()
-    // 优先使用配置的滚动容器dom
     const { scrollContainerSelector } = draw.getOptions()
     this.selectionContainer = scrollContainerSelector
       ? document.querySelector(scrollContainerSelector) || document
@@ -32,11 +29,9 @@ export class SelectionObserver {
     this.requestAnimationFrameId = null
     this.isMousedown = false
     this.isMoving = false
-    // 缓存尺寸
     this.clientWidth = 0
     this.clientHeight = 0
     this.containerRect = null
-    // 添加监听
     this._addEvent()
   }
 
@@ -58,7 +53,6 @@ export class SelectionObserver {
 
   private _mousedown = () => {
     this.isMousedown = true
-    // 更新容器宽高
     this.clientWidth =
       this.selectionContainer instanceof Document
         ? document.documentElement.clientWidth
@@ -67,7 +61,6 @@ export class SelectionObserver {
       this.selectionContainer instanceof Document
         ? document.documentElement.clientHeight
         : this.selectionContainer.clientHeight
-    // 更新容器位置信息
     if (!(this.selectionContainer instanceof Document)) {
       const rect = this.selectionContainer.getBoundingClientRect()
       this.containerRect = rect
@@ -100,7 +93,6 @@ export class SelectionObserver {
   }
 
   private _move(direction: MoveDirection) {
-    // Document使用window
     const container =
       this.selectionContainer instanceof Document
         ? window

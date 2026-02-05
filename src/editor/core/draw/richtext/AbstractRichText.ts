@@ -32,14 +32,12 @@ export abstract class AbstractRichText {
     decorationStyle?: TextDecorationStyle
   ) {
     const isFirstRecord = !this.fillRect.width
-    // 颜色不同时立即绘制
     if (
       !isFirstRecord &&
       (this.fillColor !== color || this.fillDecorationStyle !== decorationStyle)
     ) {
       this.render(ctx)
       this.clearFillInfo()
-      // 重新记录
       this.recordFillInfo(ctx, x, y, width, height, color, decorationStyle)
       return
     }

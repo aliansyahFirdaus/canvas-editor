@@ -11,7 +11,6 @@ export function tab(evt: KeyboardEvent, host: CanvasEvent) {
   const isReadonly = draw.isReadonly()
   if (isReadonly) return
   evt.preventDefault()
-  // 在控件上下文时，tab键控制控件之间移动
   const control = draw.getControl()
   const activeControl = control.getActiveControl()
   if (activeControl && control.getIsRangeWithinControl()) {
@@ -22,9 +21,7 @@ export function tab(evt: KeyboardEvent, host: CanvasEvent) {
     const rangeManager = draw.getRange()
     const elementList = draw.getElementList()
     const { startIndex, endIndex } = rangeManager.getRange()
-    // 插入tab符
     const anchorStyle = rangeManager.getRangeAnchorStyle(elementList, endIndex)
-    // 仅复制样式
     const copyStyle = anchorStyle
       ? pickObject(anchorStyle, EDITOR_ELEMENT_STYLE_ATTR)
       : null

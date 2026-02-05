@@ -116,10 +116,8 @@ export class Search {
     const height = this.draw.getHeight()
     const pageGap = this.draw.getPageGap()
     const preY = pageNo * (height + pageGap)
-    // 创建定位锚点
     const anchor = document.createElement('div')
     anchor.style.position = 'absolute'
-    // 扩大搜索词尺寸，使可视范围更广
     const ANCHOR_OVERFLOW_SIZE = 50
     anchor.style.width = `${rightTop[0] - leftTop[0] + ANCHOR_OVERFLOW_SIZE}px`
     anchor.style.height = `${
@@ -128,7 +126,6 @@ export class Search {
     anchor.style.left = `${leftTop[0]}px`
     anchor.style.top = `${leftTop[1] + preY}px`
     this.draw.getContainer().append(anchor)
-    // 移动到可视范围
     anchor.scrollIntoView(false)
     anchor.remove()
   }
@@ -172,14 +169,12 @@ export class Search {
       this.searchOptions || {}
     const keyword = isIgnoreCase ? payload.toLocaleLowerCase() : payload
     const searchMatchList: ISearchResult[] = []
-    // 分组
     const elementListGroup: {
       type: EditorContext
       elementList: IElement[]
       index: number
     }[] = []
     const originalElementListLength = originalElementList.length
-    // 查找表格所在位置
     const tableIndexList = []
     for (let e = 0; e < originalElementListLength; e++) {
       const element = originalElementList[e]
@@ -212,7 +207,6 @@ export class Search {
       elementIndex = endIndex + 1
       i++
     }
-    // 搜索文本
     function searchClosure(
       payload: string | null,
       type: EditorContext,
@@ -237,9 +231,7 @@ export class Search {
       if (isIgnoreCase) {
         text = text.toLocaleLowerCase()
       }
-      // 匹配的结果列表
       const matchList: { index: number; length: number }[] = []
-      // 从索引0开始依次匹配
       const searchStr = isRegEnable ? new RegExp(payload) : payload
       let { index, length } = indexOf(text, searchStr)
       while (index !== -1 && length !== 0) {
@@ -295,16 +287,13 @@ export class Search {
   public compute(payload: string) {
     const isPickSelectionElementList =
       this.searchOptions?.isLimitSelection && !this.range.getIsCollapsed()
-    // 搜索元素范围（默认全部 || 设置搜索选中区域）
     const searchElementList = isPickSelectionElementList
       ? this.range.getSelectionElementList()
       : this.draw.getOriginalElementList()
     if (!searchElementList?.length) return
     this.searchMatchList = this.getMatchList(payload, searchElementList)
-    // 根据选区位置index/tableIndex往后移动
     if (!isPickSelectionElementList || !this.searchMatchList.length) return
     const { startIndex } = this.range.getRange()
-    // getSelectionElementList实际返回的元素列表为选区位置之后的元素列表，所以需要+1
     const offset = startIndex + 1
     for (const searchMatch of this.searchMatchList) {
       if (searchMatch.type === EditorContext.TABLE) {
@@ -346,11 +335,9 @@ export class Search {
         pageNo
       } = position
       if (pageNo !== pageIndex) continue
-      // 高亮并定位当前搜索词
       const searchMatchIndexList = this.getSearchNavigateIndexList()
       if (searchMatchIndexList.includes(s)) {
         ctx.fillStyle = searchNavigateMatchColor
-        // 是否是第一个字符，则移动到可视范围
         const preSearchMatch = this.searchMatchList[s - 1]
         if (!preSearchMatch || preSearchMatch.groupId !== searchMatch.groupId) {
           this.searchNavigateScrollIntoView(position)
@@ -372,7 +359,6 @@ export class Search {
     if (isReadonly) return
     if (payload === undefined || payload === null) return
     let matchList = this.getSearchMatchList()
-    // 替换搜索项
     const replaceIndex = option?.index
     if (isNumber(replaceIndex)) {
       const matchGroup: ISearchResult[][] = []
@@ -388,14 +374,10 @@ export class Search {
     }
     if (!matchList?.length) return
     const isDesignMode = this.draw.isDesignMode()
-    // 匹配index变化的差值
     let pageDiffCount = 0
     let tableDiffCount = 0
-    // 匹配搜索词的组标识
     let curGroupId = ''
-    // 表格上下文
     let curTdId = ''
-    // 搜索值 > 替换值：增加元素；搜索值 < 替换值：减少元素
     let firstMatchIndex = -1
     const elementList = this.draw.getOriginalElementList()
     for (let m = 0; m < matchList.length; m++) {
@@ -409,10 +391,8 @@ export class Search {
         const curTableIndex = tableIndex! + pageDiffCount
         const tableElementList =
           elementList[curTableIndex].trList![trIndex!].tdList[tdIndex!].value
-        // 表格内元素
         const curIndex = index + tableDiffCount
         const tableElement = tableElementList[curIndex]
-        // 非设计模式下设置元素不可删除 || 控件结构元素 => 禁止替换
         if (
           !isDesignMode &&
           (tableElement?.control?.deletable === false ||
@@ -453,7 +433,6 @@ export class Search {
       } else {
         const curIndex = match.index + pageDiffCount
         const element = elementList[curIndex]
-        // 非设计模式下设置元素不可删除 || 控件结构元素 => 禁止替换
         if (
           (!isDesignMode &&
             (element?.control?.deletable === false ||
@@ -497,7 +476,6 @@ export class Search {
       curGroupId = match.groupId
     }
     if (!~firstMatchIndex) return
-    // 定位-首个被匹配关键词后
     const firstMatch = matchList[firstMatchIndex]
     const firstIndex = firstMatch.index + (payload.length - 1)
     if (firstMatch.type === EditorContext.TABLE) {
@@ -519,7 +497,6 @@ export class Search {
       })
     }
     this.draw.getRange().setRange(firstIndex, firstIndex)
-    // 重新渲染
     this.draw.render({
       curIndex: firstIndex
     })

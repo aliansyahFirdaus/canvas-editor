@@ -28,9 +28,7 @@ export function pasteElement(host: CanvasEvent, elementList: IElement[]) {
   const rangeManager = draw.getRange()
   const { startIndex } = rangeManager.getRange()
   const originalElementList = draw.getElementList()
-  // 全选粘贴无需格式化上下文
   if (~startIndex && !rangeManager.getIsSelectAll()) {
-    // 如果是复制到虚拟元素里，则粘贴列表的虚拟元素需扁平化处理，避免产生新的虚拟元素
     const anchorElement = originalElementList[startIndex]
     if (anchorElement?.titleId || anchorElement?.listId) {
       let start = 0
@@ -79,11 +77,9 @@ export function pasteImage(host: CanvasEvent, file: File | Blob) {
   const rangeManager = draw.getRange()
   const { startIndex } = rangeManager.getRange()
   const elementList = draw.getElementList()
-  // 创建文件读取器
   const fileReader = new FileReader()
   fileReader.readAsDataURL(file)
   fileReader.onload = () => {
-    // 计算宽高
     const image = new Image()
     const value = fileReader.result as string
     image.src = value
@@ -109,18 +105,14 @@ export function pasteByEvent(host: CanvasEvent, evt: ClipboardEvent) {
   if (draw.isReadonly() || draw.isDisabled()) return
   const clipboardData = evt.clipboardData
   if (!clipboardData) return
-  // 自定义粘贴事件
   const { paste } = draw.getOverride()
   if (paste) {
     const overrideResult = paste(evt)
-    // 默认阻止默认事件
     if ((<IOverrideResult>overrideResult)?.preventDefault !== false) return
   }
-  // 优先读取编辑器内部粘贴板数据（粘贴板不包含文件时）
   if (!getIsClipboardContainFile(clipboardData)) {
     const clipboardText = clipboardData.getData('text')
     const editorClipboardData = getClipboardData()
-    // 不同系统间默认换行符不同 windows:\r\n mac:\n
     if (
       editorClipboardData &&
       normalizeLineBreak(clipboardText) ===
@@ -131,7 +123,6 @@ export function pasteByEvent(host: CanvasEvent, evt: ClipboardEvent) {
     }
   }
   removeClipboardData()
-  // 从粘贴板提取数据
   let isHTML = false
   for (let i = 0; i < clipboardData.items.length; i++) {
     const item = clipboardData.items[i]
@@ -169,14 +160,11 @@ export function pasteByEvent(host: CanvasEvent, evt: ClipboardEvent) {
 export async function pasteByApi(host: CanvasEvent, options?: IPasteOption) {
   const draw = host.getDraw()
   if (draw.isReadonly() || draw.isDisabled()) return
-  // 自定义粘贴事件
   const { paste } = draw.getOverride()
   if (paste) {
     const overrideResult = paste()
-    // 默认阻止默认事件
     if ((<IOverrideResult>overrideResult)?.preventDefault !== false) return
   }
-  // 优先读取编辑器内部粘贴板数据
   const clipboardText = await navigator.clipboard.readText()
   const editorClipboardData = getClipboardData()
   if (
@@ -188,7 +176,6 @@ export async function pasteByApi(host: CanvasEvent, options?: IPasteOption) {
     return
   }
   removeClipboardData()
-  // 从内存粘贴板获取数据
   if (options?.isPlainText) {
     if (clipboardText) {
       host.input(clipboardText)

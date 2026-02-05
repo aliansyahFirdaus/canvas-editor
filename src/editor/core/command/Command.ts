@@ -1,6 +1,5 @@
 import { CommandAdapt } from './CommandAdapt'
 
-// 通过CommandAdapt中转避免直接暴露编辑器上下文
 export class Command {
   public executeMode: CommandAdapt['mode']
   public executeCut: CommandAdapt['cut']
@@ -143,7 +142,6 @@ export class Command {
   public getElementById: CommandAdapt['getElementById']
 
   constructor(adapt: CommandAdapt) {
-    // 全局命令
     this.executeMode = adapt.mode.bind(adapt)
     this.executeCut = adapt.cut.bind(adapt)
     this.executeCopy = adapt.copy.bind(adapt)
@@ -155,13 +153,11 @@ export class Command {
     this.executeSetPositionContext = adapt.setPositionContext.bind(adapt)
     this.executeForceUpdate = adapt.forceUpdate.bind(adapt)
     this.executeBlur = adapt.blur.bind(adapt)
-    // 撤销、重做、格式刷、清除格式
     this.executeUndo = adapt.undo.bind(adapt)
     this.executeRedo = adapt.redo.bind(adapt)
     this.executePainter = adapt.painter.bind(adapt)
     this.executeApplyPainterStyle = adapt.applyPainterStyle.bind(adapt)
     this.executeFormat = adapt.format.bind(adapt)
-    // 字体、字体大小、字体变大、字体变小、加粗、斜体、下划线、删除线、字体颜色、背景色
     this.executeFont = adapt.font.bind(adapt)
     this.executeSize = adapt.size.bind(adapt)
     this.executeSizeAdd = adapt.sizeAdd.bind(adapt)
@@ -174,12 +170,10 @@ export class Command {
     this.executeSubscript = adapt.subscript.bind(adapt)
     this.executeColor = adapt.color.bind(adapt)
     this.executeHighlight = adapt.highlight.bind(adapt)
-    // 标题、对齐方式、列表
     this.executeTitle = adapt.title.bind(adapt)
     this.executeList = adapt.list.bind(adapt)
     this.executeRowFlex = adapt.rowFlex.bind(adapt)
     this.executeRowMargin = adapt.rowMargin.bind(adapt)
-    // 表格、图片上传、超链接、搜索、打印、图片操作
     this.executeInsertTable = adapt.insertTable.bind(adapt)
     this.executeInsertTableTopRow = adapt.insertTableTopRow.bind(adapt)
     this.executeInsertTableBottomRow = adapt.insertTableBottomRow.bind(adapt)
@@ -220,7 +214,6 @@ export class Command {
     this.executeSaveAsImageElement = adapt.saveAsImageElement.bind(adapt)
     this.executeSetImageCrop = adapt.setImageCrop.bind(adapt)
     this.executeChangeImageDisplay = adapt.changeImageDisplay.bind(adapt)
-    // 页面模式、页面缩放、纸张大小、纸张方向、页边距
     this.executePageMode = adapt.pageMode.bind(adapt)
     this.executePageScale = adapt.pageScale.bind(adapt)
     this.executePageScaleRecovery = adapt.pageScaleRecovery.bind(adapt)
@@ -229,18 +222,14 @@ export class Command {
     this.executePaperSize = adapt.paperSize.bind(adapt)
     this.executePaperDirection = adapt.paperDirection.bind(adapt)
     this.executeSetPaperMargin = adapt.setPaperMargin.bind(adapt)
-    // 签章
     this.executeSetMainBadge = adapt.setMainBadge.bind(adapt)
     this.executeSetAreaBadge = adapt.setAreaBadge.bind(adapt)
-    // 区域
     this.getAreaValue = adapt.getAreaValue.bind(adapt)
     this.executeInsertArea = adapt.insertArea.bind(adapt)
     this.executeSetAreaValue = adapt.setAreaValue.bind(adapt)
     this.executeSetAreaProperties = adapt.setAreaProperties.bind(adapt)
     this.executeLocationArea = adapt.locationArea.bind(adapt)
-    // 涂鸦
     this.executeClearGraffiti = adapt.clearGraffiti.bind(adapt)
-    // 通用
     this.executeInsertElementList = adapt.insertElementList.bind(adapt)
     this.executeAppendElementList = adapt.appendElementList.bind(adapt)
     this.executeUpdateElementById = adapt.updateElementById.bind(adapt)
@@ -259,7 +248,6 @@ export class Command {
     this.executeUpdateOptions = adapt.updateOptions.bind(adapt)
     this.executeInsertTitle = adapt.insertTitle.bind(adapt)
     this.executeFocus = adapt.focus.bind(adapt)
-    // 获取
     this.getImage = adapt.getImage.bind(adapt)
     this.getOptions = adapt.getOptions.bind(adapt)
     this.getValue = adapt.getValue.bind(adapt)
@@ -284,7 +272,6 @@ export class Command {
     this.getTitleValue = adapt.getTitleValue.bind(adapt)
     this.getPositionContextByEvent = adapt.getPositionContextByEvent.bind(adapt)
     this.getElementById = adapt.getElementById.bind(adapt)
-    // 控件
     this.executeSetControlValue = adapt.setControlValue.bind(adapt)
     this.executeSetControlValueList = adapt.setControlValueList.bind(adapt)
     this.executeSetControlExtension = adapt.setControlExtension.bind(adapt)

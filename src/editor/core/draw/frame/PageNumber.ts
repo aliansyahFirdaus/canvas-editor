@@ -43,7 +43,6 @@ export class PageNumber {
       }
     } = this.options
     if (pageNo < fromPageNo) return
-    // 处理页码格式
     let text = format
     const pageNoReg = new RegExp(FORMAT_PLACEHOLDER.PAGE_NO)
     if (pageNoReg.test(text)) {
@@ -64,14 +63,12 @@ export class PageNumber {
       )
     }
     const width = this.draw.getWidth()
-    // 计算y位置
     const height = this.draw.getHeight()
     const pageNumberBottom = this.draw.getPageNumberBottom()
     const y = height - pageNumberBottom
     ctx.save()
     ctx.fillStyle = color
     ctx.font = `${size * scale}px ${font}`
-    // 计算x位置-居左、居中、居右
     let x = 0
     const margins = this.draw.getMargins()
     const { width: textWidth } = ctx.measureText(text)

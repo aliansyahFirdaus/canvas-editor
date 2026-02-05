@@ -307,7 +307,6 @@ export class CommandAdapt {
   }
 
   public painter(options: IPainterOption) {
-    // 如果单击且已经有样式设置则取消设置
     if (!options.isDblclick && this.draw.getPainterStyle()) {
       this.canvasEvent.clearPainterStyle()
       return
@@ -340,7 +339,6 @@ export class CommandAdapt {
       (this.draw.isReadonly() || this.draw.isDisabled())
     if (isDisabled) return
     const selection = this.range.getSelectionElementList()
-    // 选区设置或设置换行处样式
     let renderOption: IDrawOption = {}
     let changeElementList: IElement[] = []
     if (selection?.length) {
@@ -405,7 +403,6 @@ export class CommandAdapt {
     if (isDisabled) return
     const { minSize, maxSize, defaultSize } = this.options
     if (payload < minSize || payload > maxSize) return
-    // 选区设置或设置换行处样式
     let renderOption: IDrawOption = {}
     let changeElementList: IElement[] = []
     const selection = this.range.getTextLikeSelectionElementList()
@@ -455,7 +452,6 @@ export class CommandAdapt {
     if (isDisabled) return
     const { defaultSize, maxSize } = this.options
     const selection = this.range.getTextLikeSelectionElementList()
-    // 选区设置或设置换行处样式
     let renderOption: IDrawOption = {}
     let changeElementList: IElement[] = []
     if (selection?.length) {
@@ -465,7 +461,6 @@ export class CommandAdapt {
       const { endIndex } = this.range.getRange()
       const elementList = this.draw.getElementList()
       const enterElement = elementList[endIndex]
-      // 设置默认样式
       const style = this.range.getDefaultStyle()
       const anchorSize = style?.size || enterElement.size || defaultSize
       this.range.setDefaultStyle({
@@ -509,7 +504,6 @@ export class CommandAdapt {
     if (isDisabled) return
     const { defaultSize, minSize } = this.options
     const selection = this.range.getTextLikeSelectionElementList()
-    // 选区设置或设置换行处样式
     let renderOption: IDrawOption = {}
     let changeElementList: IElement[] = []
     if (selection?.length) {
@@ -731,14 +725,12 @@ export class CommandAdapt {
       s => s.type === ElementType.SUPERSCRIPT
     )
     selection.forEach(el => {
-      // 取消上标
       if (~superscriptIndex) {
         if (el.type === ElementType.SUPERSCRIPT) {
           el.type = ElementType.TEXT
           delete el.actualSize
         }
       } else {
-        // 设置上标
         if (
           !el.type ||
           el.type === ElementType.TEXT ||
@@ -763,14 +755,12 @@ export class CommandAdapt {
       s => s.type === ElementType.SUBSCRIPT
     )
     selection.forEach(el => {
-      // 取消下标
       if (~subscriptIndex) {
         if (el.type === ElementType.SUBSCRIPT) {
           el.type = ElementType.TEXT
           delete el.actualSize
         }
       } else {
-        // 设置下标
         if (
           !el.type ||
           el.type === ElementType.TEXT ||
@@ -877,13 +867,11 @@ export class CommandAdapt {
     const { startIndex, endIndex } = this.range.getRange()
     if (!~startIndex && !~endIndex) return
     const elementList = this.draw.getElementList()
-    // 需要改变的元素列表
     const changeElementList =
       startIndex === endIndex
         ? this.range.getRangeParagraphElementList()
         : elementList.slice(startIndex + 1, endIndex + 1)
     if (!changeElementList || !changeElementList.length) return
-    // 设置值
     const titleId = getUUID()
     const titleOptions = this.draw.getOptions().title
     changeElementList.forEach(el => {
@@ -905,7 +893,6 @@ export class CommandAdapt {
         }
       }
     })
-    // 光标定位
     const isSetCursor = startIndex === endIndex
     const curIndex = isSetCursor ? endIndex : startIndex
     this.draw.render({ curIndex, isSetCursor })
@@ -927,7 +914,6 @@ export class CommandAdapt {
     rowElementList.forEach(element => {
       element.rowFlex = payload
     })
-    // 光标定位
     const isSetCursor = startIndex === endIndex
     const curIndex = isSetCursor ? endIndex : startIndex
     this.draw.render({ curIndex, isSetCursor })
@@ -943,7 +929,6 @@ export class CommandAdapt {
     rowElementList.forEach(element => {
       element.rowMargin = payload
     })
-    // 光标定位
     const isSetCursor = startIndex === endIndex
     const curIndex = isSetCursor ? endIndex : startIndex
     this.draw.render({ curIndex, isSetCursor })
@@ -1093,7 +1078,6 @@ export class CommandAdapt {
     const elementList = this.draw.getElementList()
     const startElement = elementList[startIndex]
     if (startElement.type !== ElementType.HYPERLINK) return null
-    // 向左查找
     let preIndex = startIndex
     while (preIndex > 0) {
       const preElement = elementList[preIndex]
@@ -1103,7 +1087,6 @@ export class CommandAdapt {
       }
       preIndex--
     }
-    // 向右查找
     let nextIndex = startIndex + 1
     while (nextIndex < elementList.length) {
       const nextElement = elementList[nextIndex]
@@ -1113,7 +1096,6 @@ export class CommandAdapt {
       }
       nextIndex++
     }
-    // 控件在最后
     if (nextIndex === elementList.length) {
       rightIndex = nextIndex - 1
     }
@@ -1124,19 +1106,16 @@ export class CommandAdapt {
   public deleteHyperlink() {
     const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
     if (isDisabled) return
-    // 获取超链接索引
     const hyperRange = this.getHyperlinkRange()
     if (!hyperRange) return
     const elementList = this.draw.getElementList()
     const [leftIndex, rightIndex] = hyperRange
-    // 删除元素
     this.draw.spliceElementList(
       elementList,
       leftIndex,
       rightIndex - leftIndex + 1
     )
     this.draw.getHyperlinkParticle().clearHyperlinkPopup()
-    // 重置画布
     const newIndex = leftIndex - 1
     this.range.setRange(newIndex, newIndex)
     this.draw.render({
@@ -1147,12 +1126,10 @@ export class CommandAdapt {
   public cancelHyperlink() {
     const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
     if (isDisabled) return
-    // 获取超链接索引
     const hyperRange = this.getHyperlinkRange()
     if (!hyperRange) return
     const elementList = this.draw.getElementList()
     const [leftIndex, rightIndex] = hyperRange
-    // 删除属性
     for (let i = leftIndex; i <= rightIndex; i++) {
       const element = elementList[i]
       delete element.type
@@ -1161,7 +1138,6 @@ export class CommandAdapt {
       delete element.underline
     }
     this.draw.getHyperlinkParticle().clearHyperlinkPopup()
-    // 重置画布
     const { endIndex } = this.range.getRange()
     this.draw.render({
       curIndex: endIndex,
@@ -1172,18 +1148,15 @@ export class CommandAdapt {
   public editHyperlink(payload: string) {
     const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
     if (isDisabled) return
-    // 获取超链接索引
     const hyperRange = this.getHyperlinkRange()
     if (!hyperRange) return
     const elementList = this.draw.getElementList()
     const [leftIndex, rightIndex] = hyperRange
-    // 替换url
     for (let i = leftIndex; i <= rightIndex; i++) {
       const element = elementList[i]
       element.url = payload
     }
     this.draw.getHyperlinkParticle().clearHyperlinkPopup()
-    // 重置画布
     const { endIndex } = this.range.getRange()
     this.draw.render({
       curIndex: endIndex,
@@ -1224,7 +1197,6 @@ export class CommandAdapt {
         dashArray,
         ...option
       }
-      // 从行头增加分割线
       formatElementContext(elementList, [newElement], startIndex, {
         editorOptions: this.options
       })
@@ -1496,13 +1468,11 @@ export class CommandAdapt {
     const range = this.range.getRange()
     const { startIndex, endIndex } = range
     if (!~startIndex && !~endIndex) return null
-    // 选区信息
     const isCollapsed = startIndex === endIndex
     const selectionText = this.range.toString()
     const selectionElementList = zipElementList(
       this.range.getSelectionElementList() || []
     )
-    // 元素信息
     const elementList = this.draw.getElementList()
     const startElement = pickElementAttr(
       elementList[isCollapsed ? startIndex : startIndex + 1],
@@ -1522,20 +1492,16 @@ export class CommandAdapt {
     const endPageNo = endPosition.pageNo
     const startRowNo = startPosition.rowIndex
     const endRowNo = endPosition.rowIndex
-    // 列信息
     const startRow = rowList[startRowNo]
     const endRow = rowList[endRowNo]
     let startColNo = 0
     let endColNo = 0
-    // 以光标显示位置为准
     if (!this.draw.getCursor().getHitLineStartIndex()) {
-      // 换行符不计算列数量
       startColNo =
         startRow.elementList[0]?.value === ZERO
           ? startPosition.index! - startRow.startIndex
           : startPosition.index! - startRow.startIndex + 1
     }
-    // 光标闭合时列位置相同
     if (startPosition === endPosition) {
       endColNo = startColNo
     } else {
@@ -1562,7 +1528,6 @@ export class CommandAdapt {
           coordinate: { leftTop, rightTop },
           lineHeight
         } = selectionPositionList[p]
-        // 起始行变化追加选区信息
         if (currentRowNo === null || currentRowNo !== rowNo) {
           if (rangeRect) {
             rangeRects.push(rangeRect)
@@ -1598,9 +1563,7 @@ export class CommandAdapt {
         height: lineHeight
       })
     }
-    // 区域信息
     const zone = this.draw.getZone().getZone()
-    // 表格信息
     const { isTable, trIndex, tdIndex, index } =
       this.position.getPositionContext()
     let tableElement: IElement | null = null
@@ -1611,7 +1574,6 @@ export class CommandAdapt {
         tableElement = zipElementList([originTableElement])[0]
       }
     }
-    // 标题信息
     let titleId: string | null = null
     let titleStartPageNo: number | null = null
     let start = startIndex - 1
@@ -1681,7 +1643,6 @@ export class CommandAdapt {
               ?.positionList || []
         }
       }
-      // 获取关键词始末位置
       const startPosition = deepClone(keywordPositionList[startIndex])
       const endPosition = deepClone(keywordPositionList[endIndex])
       searchResultContextList.push({
@@ -1770,7 +1731,6 @@ export class CommandAdapt {
       this.range.shrinkRange()
     }
     const cloneElementList = deepClone(payload)
-    // 格式化上下文信息
     const { startIndex } = this.range.getRange()
     const elementList = this.draw.getElementList()
     formatElementContext(elementList, cloneElementList, startIndex, {
@@ -1824,7 +1784,6 @@ export class CommandAdapt {
         }
       }
     }
-    // 优先正文再页眉页脚
     const data = [
       this.draw.getOriginalMainElementList(),
       this.draw.getHeaderElementList(),
@@ -1833,11 +1792,9 @@ export class CommandAdapt {
     for (const elementList of data) {
       getElementInfoById(elementList)
     }
-    // 更新内容
     if (!updateElementInfoList.length) return
     for (let i = 0; i < updateElementInfoList.length; i++) {
       const { elementList, index } = updateElementInfoList[i]
-      // 重新格式化元素
       const oldElement = elementList[index]
       const newElement = zipElementList(
         [
@@ -1850,7 +1807,6 @@ export class CommandAdapt {
           extraPickAttrs: ['id']
         }
       )
-      // 区域上下文提取
       cloneProperty<IElement>(AREA_CONTEXT_ATTR, oldElement, newElement[0])
       formatElementList(newElement, {
         isHandleFirstElement: false,
@@ -1892,7 +1848,6 @@ export class CommandAdapt {
         i++
       }
     }
-    // 优先正文再页眉页脚
     const data = [
       this.draw.getOriginalMainElementList(),
       this.draw.getHeaderElementList(),
@@ -2001,11 +1956,9 @@ export class CommandAdapt {
       const elementList = this.draw.getElementList()
       const element = elementList[startIndex]
       if (!element.controlId) return
-      // 删除控件
       const control = this.draw.getControl()
       const newIndex = control.removeControl(startIndex)
       if (newIndex === null) return
-      // 重新渲染
       this.range.setRange(newIndex, newIndex)
       this.draw.render({
         curIndex: newIndex
@@ -2060,7 +2013,6 @@ export class CommandAdapt {
             }
           }
         }
-        // 找到标题末尾
         if (element.titleId === titleId) {
           let newIndex = e
           while (newIndex < elementList.length) {
@@ -2135,7 +2087,6 @@ export class CommandAdapt {
       }
     }
     if (!isApply) {
-      // 避免输入框光标丢失
       const isCollapsed = this.range.getIsCollapsed()
       this.draw.getCursor().drawCursor({
         isShow: isCollapsed
@@ -2294,7 +2245,6 @@ export class CommandAdapt {
         if (element?.controlId !== controlId) continue
         let curIndex = i - 1
         if (options?.position === LocationPosition.OUTER_AFTER) {
-          // 控件外面最后
           if (
             !(
               element.controlComponent === ControlComponent.POSTFIX &&
@@ -2305,10 +2255,8 @@ export class CommandAdapt {
             continue
           }
         } else if (options?.position === LocationPosition.OUTER_BEFORE) {
-          // 控件外面最前
           curIndex -= 1
         } else if (options?.position === LocationPosition.AFTER) {
-          // 控件内部最后
           curIndex -= 1
           if (
             element.controlComponent !== ControlComponent.PLACEHOLDER &&
@@ -2376,7 +2324,6 @@ export class CommandAdapt {
     const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
     if (isDisabled) return
     const cloneElement = deepClone(payload)
-    // 格式化上下文信息
     const { startIndex } = this.range.getRange()
     const elementList = this.draw.getElementList()
     const copyElement = getAnchorElement(elementList, startIndex)
@@ -2388,7 +2335,6 @@ export class CommandAdapt {
       ...AREA_CONTEXT_ATTR
     ]
     cloneProperty<IElement>(cloneAttr, copyElement, cloneElement)
-    // 插入控件
     this.draw.insertElementList([cloneElement])
   }
 
@@ -2497,7 +2443,6 @@ export class CommandAdapt {
     ) {
       return null
     }
-    // 命中元素信息
     let tableInfo: ITableInfoByEvent | null = null
     let element: IElement | null = null
     const elementList = this.draw.getOriginalElementList()
@@ -2545,7 +2490,6 @@ export class CommandAdapt {
     const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
     if (isDisabled) return
     const cloneElement = deepClone(payload)
-    // 格式化上下文信息
     const { startIndex } = this.range.getRange()
     const elementList = this.draw.getElementList()
     const copyElement = getAnchorElement(elementList, startIndex)
@@ -2559,7 +2503,6 @@ export class CommandAdapt {
     cloneElement.valueList?.forEach(valueItem => {
       cloneProperty<IElement>(cloneAttr, copyElement, valueItem)
     })
-    // 插入标题
     this.draw.insertElementList([cloneElement])
   }
 
@@ -2572,12 +2515,10 @@ export class CommandAdapt {
     } = payload || {}
     let curIndex = -1
     if (range) {
-      // 根据选区定位
       this.range.replaceRange(range)
       curIndex =
         position === LocationPosition.BEFORE ? range.startIndex : range.endIndex
     } else if (isNumber(rowNo)) {
-      // 根据行号定位
       const rowList = this.draw.getOriginalRowList()
       curIndex =
         position === LocationPosition.BEFORE
@@ -2586,14 +2527,12 @@ export class CommandAdapt {
       if (!isNumber(curIndex)) return
       this.range.setRange(curIndex, curIndex)
     } else {
-      // 默认文档首尾
       curIndex =
         position === LocationPosition.BEFORE
           ? 0
           : this.draw.getOriginalMainElementList().length - 1
       this.range.setRange(curIndex, curIndex)
     }
-    // 光标存在且闭合时定位
     const renderParams: IDrawOption = {
       isCompute: false,
       isSetCursor: false,
@@ -2638,7 +2577,6 @@ export class CommandAdapt {
         )
       }
     }
-    // 获取区域位置
     const context = this.draw.getArea().getContextByAreaId(areaId, options)
     if (!context) return
     const {
@@ -2656,10 +2594,8 @@ export class CommandAdapt {
     })
   }
 
-  // 清空涂鸦信息
   public clearGraffiti() {
     this.draw.getGraffiti().clear()
-    // 涂鸦模式下重新渲染
     if (this.draw.isGraffitiMode()) {
       this.draw.render({
         isCompute: false,

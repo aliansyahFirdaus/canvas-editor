@@ -29,14 +29,12 @@ export class DateParticle {
     const [leftIndex, rightIndex] = range
     const elementList = this.draw.getElementList()
     const startElement = elementList[leftIndex + 1]
-    // 删除旧时间
     this.draw.spliceElementList(
       elementList,
       leftIndex + 1,
       rightIndex - leftIndex
     )
     this.range.setRange(leftIndex, leftIndex)
-    // 插入新时间
     const dateElement: IElement = {
       type: ElementType.DATE,
       value: '',
@@ -61,7 +59,6 @@ export class DateParticle {
     const elementList = this.draw.getElementList()
     const startElement = elementList[startIndex]
     if (startElement.type !== ElementType.DATE) return null
-    // 向左查找
     let preIndex = startIndex
     while (preIndex >= 0) {
       const preElement = elementList[preIndex]
@@ -71,7 +68,6 @@ export class DateParticle {
       }
       preIndex--
     }
-    // 向右查找
     let nextIndex = startIndex + 1
     while (nextIndex < elementList.length) {
       const nextElement = elementList[nextIndex]
@@ -81,7 +77,6 @@ export class DateParticle {
       }
       nextIndex++
     }
-    // 控件在最后
     if (nextIndex === elementList.length) {
       rightIndex = nextIndex - 1
     }

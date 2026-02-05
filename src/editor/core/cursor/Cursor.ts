@@ -98,10 +98,8 @@ export class Cursor {
   }
 
   public focus() {
-    // 移动端只读模式禁用聚焦避免唤起输入法，web端允许聚焦避免事件无法捕获
     if (isMobile && this.draw.isReadonly()) return
     const agentCursorDom = this.cursorAgent.getAgentCursorDom()
-    // 光标不聚焦时重新定位
     if (document.activeElement !== agentCursorDom) {
       agentCursorDom.focus()
       agentCursorDom.setSelectionRange(0, 0)
@@ -120,10 +118,8 @@ export class Cursor {
       isFocus = true,
       hitLineStartIndex
     } = { ...cursor, ...payload }
-    // 设置光标代理
     const height = this.draw.getHeight()
     const pageGap = this.draw.getPageGap()
-    // 光标位置
     this.hitLineStartIndex = hitLineStartIndex
     if (hitLineStartIndex) {
       const positionList = this.position.getPositionList()
@@ -140,9 +136,7 @@ export class Cursor {
       ? pageNo
       : this.draw.getPageNo()
     const preY = curPageNo * (height + pageGap)
-    // 默认偏移高度
     const defaultOffsetHeight = CURSOR_AGENT_OFFSET_HEIGHT * scale
-    // 增加1/4字体大小（最小为defaultOffsetHeight即默认偏移高度）
     const increaseHeight = Math.min(metrics.height / 4, defaultOffsetHeight)
     const cursorHeight = metrics.height + increaseHeight * 2
     const agentCursorDom = this.cursorAgent.getAgentCursorDom()
@@ -151,7 +145,6 @@ export class Cursor {
         this.focus()
       })
     }
-    // fillText位置 + 文字基线到底部距离 - 模拟光标偏移量
     const descent =
       metrics.boundingBoxDescent < 0 ? 0 : metrics.boundingBoxDescent
     const cursorTop =
@@ -161,14 +154,11 @@ export class Cursor {
     agentCursorDom.style.top = `${
       cursorTop + cursorHeight - defaultOffsetHeight
     }px`
-    // 模拟光标显示
     if (!isShow) {
       this.recoveryCursor()
       return
     }
-    // 记录旧光标位置：用于光标移动到可视范围内
     const oldTop = this.cursorDom.style.top
-    // 设置光标位置
     const isReadonly = this.draw.isReadonly()
     this.cursorDom.style.width = `${width * scale}px`
     this.cursorDom.style.backgroundColor = color
@@ -181,9 +171,7 @@ export class Cursor {
     } else {
       this._clearBlinkTimeout()
     }
-    // 移动到视野范围内
     nextTick(() => {
-      // nexttick后执行 => 避免画布没有渲染完成造成残影
       this.moveCursorToVisible({
         cursorPosition: cursorPosition!,
         direction:
@@ -204,15 +192,12 @@ export class Cursor {
       pageNo,
       coordinate: { leftTop, leftBottom }
     } = cursorPosition
-    // 当前页面距离滚动容器顶部距离
     const prePageY =
       pageNo * (this.draw.getHeight() + this.draw.getPageGap()) +
       this.container.getBoundingClientRect().top
-    // 向上移动时：以顶部距离为准，向下移动时：以底部位置为准
     const isUp = direction === MoveDirection.UP
     const x = leftBottom[0]
     const y = isUp ? leftTop[1] + prePageY : leftBottom[1] + prePageY
-    // 查找滚动容器，如果是滚动容器是document，则限制范围为当前窗口
     const scrollContainer = findScrollContainer(this.container)
     const rect = {
       left: 0,
@@ -231,11 +216,9 @@ export class Cursor {
       rect.top = top
       rect.bottom = bottom
     }
-    // 可视范围根据参数调整
     const { maskMargin } = this.options
     rect.top += maskMargin[0]
     rect.bottom -= maskMargin[2]
-    // 不在可视范围时，移动滚动条到合适位置
     if (
       !(x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom)
     ) {

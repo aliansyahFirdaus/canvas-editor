@@ -20,7 +20,6 @@ export function left(evt: KeyboardEvent, host: CanvasEvent) {
   const { startIndex, endIndex } = rangeManager.getRange()
   const isCollapsed = rangeManager.getIsCollapsed()
   const elementList = draw.getElementList()
-  // 表单模式下控件移动
   const control = draw.getControl()
   if (
     draw.getMode() === EditorMode.FORM &&
@@ -33,11 +32,9 @@ export function left(evt: KeyboardEvent, host: CanvasEvent) {
     })
     return
   }
-  // 单词整体移动
   let moveCount = 1
   if (isMod(evt)) {
     const LETTER_REG = draw.getLetterReg()
-    // 起始位置
     const moveStartIndex =
       evt.shiftKey && !isCollapsed && startIndex === cursorPosition?.index
         ? endIndex
@@ -55,13 +52,11 @@ export function left(evt: KeyboardEvent, host: CanvasEvent) {
     }
   }
   const curIndex = startIndex - moveCount
-  // shift则缩放选区
   let anchorStartIndex = curIndex
   let anchorEndIndex = curIndex
   if (evt.shiftKey && cursorPosition) {
     if (startIndex !== endIndex) {
       if (startIndex === cursorPosition.index) {
-        // 减小选区
         anchorStartIndex = startIndex
         anchorEndIndex = endIndex - moveCount
       } else {
@@ -72,10 +67,8 @@ export function left(evt: KeyboardEvent, host: CanvasEvent) {
       anchorEndIndex = endIndex
     }
   }
-  // 表格单元格间跳转
   if (!evt.shiftKey) {
     const element = elementList[startIndex]
-    // 之前是表格则进入最后一个单元格最后一个元素
     if (element.type === ElementType.TABLE) {
       const trList = element.trList!
       const lastTrIndex = trList.length - 1
@@ -95,7 +88,6 @@ export function left(evt: KeyboardEvent, host: CanvasEvent) {
       anchorEndIndex = anchorStartIndex
       draw.getTableTool().render()
     } else if (element.tableId) {
-      // 在表格单元格内&在首位则往前移动单元格
       if (startIndex === 0) {
         const originalElementList = draw.getOriginalElementList()
         const trList = originalElementList[positionContext.index!].trList!
@@ -106,7 +98,6 @@ export function left(evt: KeyboardEvent, host: CanvasEvent) {
           for (let d = 0; d < tdList.length; d++) {
             const td = tdList[d]
             if (td.id !== element.tdId) continue
-            // 移动到表格前
             if (r === 0 && d === 0) {
               position.setPositionContext({
                 isTable: false
@@ -115,7 +106,6 @@ export function left(evt: KeyboardEvent, host: CanvasEvent) {
               anchorEndIndex = anchorStartIndex
               draw.getTableTool().dispose()
             } else {
-              // 上一个单元格
               let preTrIndex = r
               let preTdIndex = d - 1
               if (preTdIndex < 0) {
@@ -143,13 +133,10 @@ export function left(evt: KeyboardEvent, host: CanvasEvent) {
       }
     }
   }
-  // 执行跳转
   if (!~anchorStartIndex || !~anchorEndIndex) return
-  // 隐藏元素跳过
   const newElementList = draw.getElementList()
   anchorStartIndex = getNonHideElementIndex(newElementList, anchorStartIndex)
   anchorEndIndex = getNonHideElementIndex(newElementList, anchorEndIndex)
-  // 设置上下文
   rangeManager.setRange(anchorStartIndex, anchorEndIndex)
   const isAnchorCollapsed = anchorStartIndex === anchorEndIndex
   draw.render({

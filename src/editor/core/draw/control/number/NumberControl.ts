@@ -34,24 +34,20 @@ export class NumberControl extends TextControl {
     context: IControlContext = {},
     options: IControlRuleOption = {}
   ): number {
-    // 禁止存在非文本元素
     if (
       data.some(el => !isTextElement(el) || NON_NUMBER_STR_REG.test(el.value))
     ) {
       return -1
     }
-    // 校验填充数据后是否是数值（任何数字都是可接受的值，只要它是有效的浮点数（即不是 NaN 或 Infinity））
     const elementList = context.elementList || this.control.getElementList()
     const range = context.range || this.control.getRange()
     this.control.shrinkBoundary(context)
-    // 找到控件已经存在的元素并插入新元素后验证数值合法性
     const controlElementList = deepClone(data)
     const { startIndex, endIndex } = range
     const startElement = elementList[startIndex]
     if (
       this.control.getIsExistValueByElementListIndex(elementList, startIndex)
     ) {
-      // 向左查找
       let preIndex = startIndex
       while (preIndex > 0) {
         const preElement = elementList[preIndex]
@@ -65,7 +61,6 @@ export class NumberControl extends TextControl {
         controlElementList.unshift(preElement)
         preIndex--
       }
-      // 向右查找
       let nextIndex = endIndex + 1
       while (nextIndex < elementList.length) {
         const nextElement = elementList[nextIndex]
@@ -80,7 +75,6 @@ export class NumberControl extends TextControl {
         nextIndex++
       }
     }
-    // 提取文本
     const text = getElementListText(controlElementList)
     if (Number.isNaN(Number(text)) || !Number.isFinite(Number(text))) {
       return -1
@@ -89,7 +83,6 @@ export class NumberControl extends TextControl {
   }
 
   private _setCalculatedValue(value: number) {
-    // 清空旧值
     const prefixIndex = super.clearValue(
       {},
       {
@@ -99,7 +92,6 @@ export class NumberControl extends TextControl {
     )
     if (!~prefixIndex) return
 
-    // 样式赋值元素-默认值的第一个字符样式，否则取默认样式
     const elementList = this.control.getElementList()
     const range = this.control.getRange()
     const valueElement = this.getValue()[0]
@@ -107,13 +99,11 @@ export class NumberControl extends TextControl {
       ? pickObject(valueElement, EDITOR_ELEMENT_STYLE_ATTR)
       : pickObject(elementList[range.startIndex], CONTROL_STYLE_ATTR)
 
-    // 属性赋值元素-默认为前缀属性
     const propertyElement = omitObject(
       elementList[prefixIndex],
       EDITOR_ELEMENT_STYLE_ATTR
     )
 
-    // 创建新的元素
     const valueStr = value.toString()
     const data: IElement[] = []
 
@@ -128,23 +118,18 @@ export class NumberControl extends TextControl {
       data.push(newElement)
     }
 
-    // 设置值
     this.setValue(data)
 
-    // 重新渲染控件
     this.control.repaintControl({
       curIndex: prefixIndex + data.length
     })
 
-    // 触发控件内容变化事件
     this.control.emitControlContentChange()
 
-    // 销毁弹窗
     this.destroy()
   }
 
   public awake() {
-    // 检查是否启用计算器模式
     const isCalculatorEnabled =
       this.element.control?.numberExclusiveOptions?.calculatorDisabled === false
     if (
@@ -161,7 +146,6 @@ export class NumberControl extends TextControl {
       return
     }
 
-    // 创建计算器实例
     this.calculator = new Calculator({
       control: this.control,
       onCalculate: result => {
@@ -169,7 +153,6 @@ export class NumberControl extends TextControl {
       }
     })
 
-    // 显示计算器弹窗
     this.calculator.createPopup()
     this.isPopup = true
   }

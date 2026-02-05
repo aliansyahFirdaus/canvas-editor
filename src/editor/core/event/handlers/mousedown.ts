@@ -17,7 +17,6 @@ export function setRangeCache(host: CanvasEvent) {
   const draw = host.getDraw()
   const position = draw.getPosition()
   const rangeManager = draw.getRange()
-  // 缓存选区上下文信息
   host.isAllowDrag = true
   host.cacheRange = deepClone(rangeManager.getRange())
   host.cacheElementList = draw.getElementList()
@@ -27,7 +26,6 @@ export function setRangeCache(host: CanvasEvent) {
 
 export function hitCheckbox(element: IElement, draw: Draw) {
   const { checkbox, control } = element
-  // 复选框不在控件内独立控制
   if (!control) {
     draw.getCheckboxParticle().setSelect(element)
   } else {
@@ -49,7 +47,6 @@ export function hitCheckbox(element: IElement, draw: Draw) {
 
 export function hitRadio(element: IElement, draw: Draw) {
   const { radio, control } = element
-  // 单选框不在控件内独立控制
   if (!control) {
     draw.getRadioParticle().setSelect(element)
   } else {
@@ -66,7 +63,6 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
   let isReadonly = draw.isReadonly()
   const rangeManager = draw.getRange()
   const position = draw.getPosition()
-  // 存在选区时忽略右键点击
   const range = rangeManager.getRange()
   if (
     evt.button === MouseEventButton.RIGHT &&
@@ -74,7 +70,6 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
   ) {
     return
   }
-  // 是否是选区拖拽
   if (!host.isAllowDrag) {
     if (!isReadonly && range.startIndex !== range.endIndex) {
       const isPointInRange = rangeManager.getIsPointInRange(
@@ -89,12 +84,10 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
   }
   const target = evt.target as HTMLDivElement
   const pageIndex = target.dataset.index
-  // 设置pageNo
   if (pageIndex) {
     draw.setPageNo(Number(pageIndex))
   }
   host.isAllowSelection = true
-  // 缓存旧上下文信息
   const oldPositionContext = deepClone(position.getPositionContext())
   const positionResult = position.adjustPositionContext({
     x: evt.offsetX,
@@ -112,7 +105,6 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
     tdValueIndex,
     hitLineStartIndex
   } = positionResult
-  // 记录选区开始位置
   host.mouseDownStartPosition = {
     ...positionResult,
     index: isTable ? tdValueIndex! : index,
@@ -123,7 +115,6 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
   const positionList = position.getPositionList()
   const curIndex = isTable ? tdValueIndex! : index
   const curElement = elementList[curIndex]
-  // 绘制
   const isDirectHitImage = !!(isDirectHit && isImage)
   const isDirectHitCheckbox = !!(isDirectHit && isCheckbox)
   const isDirectHitRadio = !!(isDirectHit && isRadio)
@@ -131,7 +122,6 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
   if (~index) {
     let startIndex = curIndex
     let endIndex = curIndex
-    // shift激活时进行选区处理
     if (evt.shiftKey) {
       const { startIndex: oldStartIndex } = rangeManager.getRange()
       if (~oldStartIndex) {
@@ -147,9 +137,7 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
     }
     rangeManager.setRange(startIndex, endIndex)
     position.setCursorPosition(positionList[curIndex])
-    // 更新只读状态
     isReadonly = draw.isReadonly()
-    // 复选框
     if (isDirectHitCheckbox && !isReadonly) {
       hitCheckbox(curElement, draw)
     } else if (isDirectHitRadio && !isReadonly) {
@@ -159,7 +147,6 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
       (curElement.control?.type === ControlType.CHECKBOX ||
         curElement.control?.type === ControlType.RADIO)
     ) {
-      // 向左查找
       let preIndex = curIndex
       while (preIndex > 0) {
         const preElement = elementList[preIndex]
@@ -181,14 +168,12 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
           !isDirectHitImage && !isDirectHitCheckbox && !isDirectHitRadio
       })
     }
-    // 首字需定位到行首，非上一行最后一个字后
     if (hitLineStartIndex) {
       host.getDraw().getCursor().drawCursor({
         hitLineStartIndex
       })
     }
   }
-  // 标签点击事件
     const eventBus = draw.getEventBus()
   if (isDirectHitLabel && eventBus.isSubscribe('labelMousedown')) {
     eventBus.emit('labelMousedown', {
@@ -196,12 +181,10 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
       element: curElement
     })
   }
-  // 预览工具组件
   const previewer = draw.getPreviewer()
   previewer.clearResizer()
   if (isDirectHitImage) {
     const previewerDrawOption: IPreviewerDrawOption = {
-      // 只读或控件外表单模式禁用拖拽
       dragDisable:
         isReadonly ||
         (!curElement.controlId && draw.getMode() === EditorMode.FORM)
@@ -215,13 +198,10 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
       positionList[curIndex],
       previewerDrawOption
     )
-    // 光标事件代理丢失，重新定位
     draw.getCursor().drawCursor({
       isShow: false
     })
-    // 点击图片允许拖拽调整位置
     setRangeCache(host)
-    // 浮动元素创建镜像图片
     if (
       curElement.imgDisplay === ImageDisplay.SURROUND ||
       curElement.imgDisplay === ImageDisplay.FLOAT_TOP ||
@@ -229,7 +209,6 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
     ) {
       draw.getImageParticle().createFloatImage(curElement)
     }
-    // 图片点击事件
     if (eventBus.isSubscribe('imageMousedown')) {
       eventBus.emit('imageMousedown', {
         evt,
@@ -237,13 +216,11 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
       })
     }
   }
-  // 表格工具组件
   const tableTool = draw.getTableTool()
   tableTool.dispose()
   if (isTable && !isReadonly && draw.getMode() !== EditorMode.FORM) {
     tableTool.render()
   }
-  // 超链接
   const hyperlinkParticle = draw.getHyperlinkParticle()
   hyperlinkParticle.clearHyperlinkPopup()
   if (curElement.type === ElementType.HYPERLINK) {
@@ -253,7 +230,6 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
       hyperlinkParticle.drawHyperlinkPopup(curElement, positionList[curIndex])
     }
   }
-  // 日期控件
   const dateParticle = draw.getDateParticle()
   dateParticle.clearDatePicker()
   if (curElement.type === ElementType.DATE && !isReadonly) {

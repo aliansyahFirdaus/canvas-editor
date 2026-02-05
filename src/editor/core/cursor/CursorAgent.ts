@@ -17,14 +17,12 @@ export class CursorAgent {
     this.container = draw.getContainer()
     this.canvasEvent = canvasEvent
     this.eventBus = draw.getEventBus()
-    // 代理光标绘制
     const agentCursorDom = document.createElement('textarea')
     agentCursorDom.autocomplete = 'off'
     agentCursorDom.classList.add(`${EDITOR_PREFIX}-inputarea`)
     agentCursorDom.innerText = ''
     this.container.append(agentCursorDom)
     this.agentCursorDom = agentCursorDom
-    // 事件
     agentCursorDom.onkeydown = (evt: KeyboardEvent) => this._keyDown(evt)
     agentCursorDom.oninput = this._input.bind(this)
     agentCursorDom.onpaste = (evt: ClipboardEvent) => this._paste(evt)

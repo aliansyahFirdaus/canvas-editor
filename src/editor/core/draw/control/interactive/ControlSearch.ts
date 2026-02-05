@@ -33,7 +33,6 @@ export class ControlSearch {
     this.highlightMatchResult = []
   }
 
-  // 获取控件设置高亮信息
   public getControlHighlight(elementList: IElement[], index: number) {
     const {
       control: {
@@ -46,13 +45,11 @@ export class ControlSearch {
     const element = elementList[index]
     const isPrintMode = this.draw.isPrintMode()
     const activeControlElement = this.control.getActiveControl()?.getElement()
-    // 颜色配置：元素 > 控件激活 > 控件禁用 > 控件存在值 > 控件不存在值
     let isActiveControlHighlight = false
     let isDisabledControlHighlight = false
     let isExitsValueControlHighlight = false
     let isNoValueControlHighlight = false
     if (!element.highlight) {
-      // 控件激活时高亮色
       isActiveControlHighlight =
         !isPrintMode &&
         !!activeBackgroundColor &&
@@ -61,12 +58,10 @@ export class ControlSearch {
         !this.control.getIsRangeInPostfix()
     }
     if (!isActiveControlHighlight) {
-      // 控件禁用时高亮色
       isDisabledControlHighlight =
         !isPrintMode && !!disabledBackgroundColor && !!element.control?.disabled
     }
     if (!isDisabledControlHighlight) {
-      // 控件存在值时高亮色
       isExitsValueControlHighlight =
         !isPrintMode &&
         !!existValueBackgroundColor &&
@@ -74,7 +69,6 @@ export class ControlSearch {
         this.control.getIsExistValueByElementListIndex(elementList, index)
     }
     if (!isExitsValueControlHighlight) {
-      // 控件不存在值时高亮色
       isNoValueControlHighlight =
         !isPrintMode &&
         !!noValueBackgroundColor &&
@@ -111,7 +105,6 @@ export class ControlSearch {
       while (i < elementList.length) {
         const element = elementList[i]
         i++
-        // 表格下钻处理
         if (element.type === ElementType.TABLE) {
           const trList = element.trList!
           for (let r = 0; r < trList.length; r++) {
@@ -138,7 +131,6 @@ export class ControlSearch {
               currentControl.conceptId === highlight.conceptId)
         )
         if (!~highlightIndex) continue
-        // 搜索后控件结束索引
         const startIndex = i
         let newEndIndex = i
         while (newEndIndex < elementList.length) {
@@ -147,7 +139,6 @@ export class ControlSearch {
           newEndIndex++
         }
         i = newEndIndex
-        // 高亮信息
         const controlElementList = elementList
           .slice(startIndex, newEndIndex)
           .map(element =>

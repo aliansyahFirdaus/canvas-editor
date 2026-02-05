@@ -82,7 +82,6 @@ export function formatElementList(
     editorOptions
   } = options
   const startElement = elementList[0]
-  // 非首字符零宽节点文本元素则补偿-列表元素内部会补偿此处忽略
   if (
     isForceCompensation ||
     (isHandleFirstElement &&
@@ -97,18 +96,14 @@ export function formatElementList(
   let i = 0
   while (i < elementList.length) {
     let el = elementList[i]
-    // 优先处理虚拟元素
     if (el.type === ElementType.TITLE) {
-      // 移除父节点
       elementList.splice(i, 1)
-      // 格式化元素
       const valueList = el.valueList || []
       formatElementList(valueList, {
         ...options,
         isHandleFirstElement: false,
         isForceCompensation: false
       })
-      // 追加节点
       if (valueList.length) {
         const titleId = el.titleId || getUUID()
         const titleOptions = editorOptions.title
@@ -119,7 +114,6 @@ export function formatElementList(
             value.titleId = titleId
             value.level = el.level
           }
-          // 文本型元素设置字体及加粗
           if (isTextLikeElement(value)) {
             if (!value.size) {
               value.size = titleOptions[titleSizeMapping[value.level!]]
@@ -134,16 +128,13 @@ export function formatElementList(
       }
       i--
     } else if (el.type === ElementType.LIST) {
-      // 移除父节点
       elementList.splice(i, 1)
-      // 格式化元素
       const valueList = el.valueList || []
       formatElementList(valueList, {
         ...options,
         isHandleFirstElement: true,
         isForceCompensation: false
       })
-      // 追加节点
       if (valueList.length) {
         const listId = getUUID()
         for (let v = 0; v < valueList.length; v++) {
@@ -157,9 +148,7 @@ export function formatElementList(
       }
       i--
     } else if (el.type === ElementType.AREA) {
-      // 移除父节点
       elementList.splice(i, 1)
-      // 格式化元素
       const valueList = el?.valueList || []
       formatElementList(valueList, {
         ...options,
@@ -217,7 +206,6 @@ export function formatElementList(
               isHandleFirstElement: true,
               isForceCompensation: true
             })
-            // 首字符字体大小默认使用首个字符元素字体大小
             if (
               !td.value[0].size &&
               td.value[1]?.size &&
@@ -235,11 +223,8 @@ export function formatElementList(
         }
       }
     } else if (el.type === ElementType.HYPERLINK) {
-      // 移除父节点
       elementList.splice(i, 1)
-      // 元素展开
       const valueList = unzipElementList(el.valueList || [])
-      // 追加节点
       if (valueList.length) {
         const hyperlinkId = getUUID()
         for (let v = 0; v < valueList.length; v++) {
@@ -253,11 +238,8 @@ export function formatElementList(
       }
       i--
     } else if (el.type === ElementType.DATE) {
-      // 移除父节点
       elementList.splice(i, 1)
-      // 元素展开
       const valueList = unzipElementList(el.valueList || [])
-      // 追加节点
       if (valueList.length) {
         const dateId = getUUID()
         for (let v = 0; v < valueList.length; v++) {
@@ -271,7 +253,6 @@ export function formatElementList(
       }
       i--
     } else if (el.type === ElementType.CONTROL) {
-      // 兼容控件内容类型错误
       if (!el.control) {
         i++
         continue
@@ -295,24 +276,19 @@ export function formatElementList(
         }
       } = options
       const controlId = el.controlId || getUUID()
-      // 移除父节点
       elementList.splice(i, 1)
-      // 控件上下文提取（压缩后的控件上下文无法提取）
       const controlContext = pickObject(el, [
         ...EDITOR_ELEMENT_CONTEXT_ATTR,
         ...EDITOR_ROW_ATTR
       ])
-      // 控件设置的默认样式（以前缀为基准）
       const controlDefaultStyle = pickObject(
         <IElement>(<unknown>el.control),
         CONTROL_STYLE_ATTR
       )
-      // 前后缀个性化设置
       const thePrePostfixArg: Omit<IElement, 'value'> = {
         ...controlDefaultStyle,
         color: editorOptions.control.bracketColor
       }
-      // 前缀
       const prefixStrList = splitText(prefix || controlOption.prefix)
       for (let p = 0; p < prefixStrList.length; p++) {
         const value = prefixStrList[p]
@@ -327,7 +303,6 @@ export function formatElementList(
         })
         i++
       }
-      // 前文本
       if (preText) {
         const preTextStrList = splitText(preText)
         for (let p = 0; p < preTextStrList.length; p++) {
@@ -344,7 +319,6 @@ export function formatElementList(
           i++
         }
       }
-      // 值
       if (
         (value && value.length) ||
         type === ControlType.CHECKBOX ||
@@ -355,7 +329,6 @@ export function formatElementList(
         if (type === ControlType.CHECKBOX) {
           const codeList = code ? code.split(',') : []
           if (Array.isArray(valueSets) && valueSets.length) {
-            // 拆分valueList优先使用其属性
             const valueStyleList = valueList.reduce(
               (pre, cur) =>
                 pre.concat(
@@ -366,7 +339,6 @@ export function formatElementList(
             let valueStyleIndex = 0
             for (let v = 0; v < valueSets.length; v++) {
               const valueSet = valueSets[v]
-              // checkbox组件
               elementList.splice(i, 0, {
                 ...controlContext,
                 ...controlDefaultStyle,
@@ -381,7 +353,6 @@ export function formatElementList(
                 }
               })
               i++
-              // 文本
               const valueStrList = splitText(valueSet.value)
               for (let e = 0; e < valueStrList.length; e++) {
                 const value = valueStrList[e]
@@ -403,7 +374,6 @@ export function formatElementList(
           }
         } else if (type === ControlType.RADIO) {
           if (Array.isArray(valueSets) && valueSets.length) {
-            // 拆分valueList优先使用其属性
             const valueStyleList = valueList.reduce(
               (pre, cur) =>
                 pre.concat(
@@ -414,7 +384,6 @@ export function formatElementList(
             let valueStyleIndex = 0
             for (let v = 0; v < valueSets.length; v++) {
               const valueSet = valueSets[v]
-              // radio组件
               elementList.splice(i, 0, {
                 ...controlContext,
                 ...controlDefaultStyle,
@@ -429,7 +398,6 @@ export function formatElementList(
                 }
               })
               i++
-              // 文本
               const valueStrList = splitText(valueSet.value)
               for (let e = 0; e < valueStrList.length; e++) {
                 const value = valueStrList[e]
@@ -504,7 +472,6 @@ export function formatElementList(
           i++
         }
       }
-      // 后文本
       if (postText) {
         const postTextStrList = splitText(postText)
         for (let p = 0; p < postTextStrList.length; p++) {
@@ -521,7 +488,6 @@ export function formatElementList(
           i++
         }
       }
-      // 后缀
       const postfixStrList = splitText(postfix || controlOption.postfix)
       for (let p = 0; p < postfixStrList.length; p++) {
         const value = postfixStrList[p]
@@ -574,9 +540,7 @@ export function isSameElementExceptValue(
   if (sourceKeys.length !== targetKeys.length) return false
   for (let s = 0; s < sourceKeys.length; s++) {
     const key = sourceKeys[s] as never
-    // 值不需要校验
     if (key === 'value') continue
-    // groupIds数组需特殊校验数组是否相等
     if (
       key === 'groupIds' &&
       Array.isArray(source[key]) &&
@@ -630,7 +594,6 @@ export function zipElementList(
   let e = 0
   while (e < elementList.length) {
     let element = elementList[e]
-    // 上下文首字符（占位符）-列表首字符要保留避免是复选框
     if (
       e === 0 &&
       element.value === ZERO &&
@@ -640,11 +603,9 @@ export function zipElementList(
       e++
       continue
     }
-    // 优先处理虚拟元素，后表格、超链接、日期、控件特殊处理
     if (element.areaId) {
       const areaId = element.areaId
       const area = element.area
-      // 收集并压缩数据
       const valueList: IElement[] = []
       while (e < elementList.length) {
         const areaE = elementList[e]
@@ -658,7 +619,6 @@ export function zipElementList(
         e++
       }
       const areaElementList = zipElementList(valueList, options)
-      // 不归类区域元素
       if (isClassifyArea) {
         const areaElement: IElement = {
           type: ElementType.AREA,
@@ -673,7 +633,6 @@ export function zipElementList(
         continue
       }
     } else if (element.titleId && element.level) {
-      // 标题处理
       const titleId = element.titleId
       if (titleId) {
         const level = element.level
@@ -700,7 +659,6 @@ export function zipElementList(
         element = titleElement
       }
     } else if (element.listId && element.listType) {
-      // 列表处理
       const listId = element.listId
       if (listId) {
         const listType = element.listType
@@ -728,7 +686,6 @@ export function zipElementList(
         element = listElement
       }
     } else if (element.type === ElementType.TABLE) {
-      // 分页表格先进行合并
       if (element.pagingId) {
         let tableIndex = e + 1
         let combineCount = 0
@@ -759,7 +716,6 @@ export function zipElementList(
                 isClassifyArea: false
               })
             }
-            // 压缩单元格属性
             TABLE_TD_ZIP_ATTR.forEach(attr => {
               const value = td[attr] as never
               if (value !== undefined) {
@@ -771,7 +727,6 @@ export function zipElementList(
         }
       }
     } else if (element.type === ElementType.HYPERLINK) {
-      // 超链接处理
       const hyperlinkId = element.hyperlinkId
       if (hyperlinkId) {
         const hyperlinkElement: IElement = {
@@ -819,7 +774,6 @@ export function zipElementList(
       }
     } else if (element.controlId) {
       const controlId = element.controlId
-      // 控件包含前后缀则转换为控件
       if (element.controlComponent === ControlComponent.PREFIX) {
         const valueList: IElement[] = []
         let isFull = false
@@ -838,7 +792,6 @@ export function zipElementList(
           start++
         }
         if (isFull) {
-          // 以前缀为基准更新控件默认样式
           const controlDefaultStyle = <IControlSelect>(
             (<unknown>pickObject(element, CONTROL_STYLE_ATTR))
           )
@@ -855,11 +808,9 @@ export function zipElementList(
           }
           controlElement.control!.value = zipElementList(valueList, options)
           element = pickElementAttr(controlElement, { extraPickAttrs })
-          // 控件元素数量 - 1（当前元素）
           e += start - e - 1
         }
       }
-      // 不完整的控件元素不转化为控件，如果不是文本则直接忽略
       if (element.controlComponent) {
         delete element.control
         delete element.controlId
@@ -873,7 +824,6 @@ export function zipElementList(
         }
       }
     }
-    // 组合元素
     const pickElement = pickElementAttr(element, { extraPickAttrs })
     if (
       !element.type ||
@@ -969,7 +919,6 @@ export function getAnchorElement(
   const anchorElement = elementList[anchorIndex]
   if (!anchorElement) return null
   const anchorNextElement = elementList[anchorIndex + 1]
-  // 非列表元素 && 当前元素是换行符 && 下一个元素不是换行符 && 区域相同 => 则以下一个元素作为参考元素
   return !anchorElement.listId &&
     anchorElement.value === ZERO &&
     anchorNextElement &&
@@ -999,11 +948,9 @@ export function formatElementContext(
     ignoreContextKeys = []
   } = options || {}
   const { mode } = editorOptions || {}
-  // 非设计模式时：标题元素禁用时不复制标题属性
   if (mode !== EditorMode.DESIGN && copyElement.title?.disabled) {
     copyElement = omitObject(copyElement, TITLE_CONTEXT_ATTR)
   }
-  // 是否已经换行
   let isBreakWarped = false
   for (let e = 0; e < formatElementList.length; e++) {
     const targetElement = formatElementList[e]
@@ -1014,8 +961,6 @@ export function formatElementContext(
     ) {
       isBreakWarped = true
     }
-    // 1. 即使换行停止也要处理表格上下文信息
-    // 2. 定位元素非列表，无需处理粘贴列表的上下文，仅处理表格及行上下文信息
     if (
       isBreakWarped ||
       (!copyElement.listId && targetElement.type === ElementType.LIST)
@@ -1040,7 +985,6 @@ export function formatElementContext(
         options
       )
     }
-    // 非块类元素，需处理行属性
     const cloneAttr = [...EDITOR_ELEMENT_CONTEXT_ATTR]
     if (!getIsBlockElement(targetElement)) {
       cloneAttr.push(...EDITOR_ROW_ATTR)
@@ -1104,7 +1048,6 @@ export function splitListElement(
   const listElementListMap: Map<number, IElement[]> = new Map()
   for (let e = 0; e < elementList.length; e++) {
     const element = elementList[e]
-    // 移除列表首行换行字符-如果是复选框直接忽略
     if (e === 0) {
       if (element.checkbox) continue
       element.value = element.value.replace(START_LINE_BREAK_REG, '')
@@ -1150,7 +1093,6 @@ export function groupElementListByRowFlex(
   for (let e = 1; e < elementList.length; e++) {
     const element = elementList[e]
     const rowFlex = element.rowFlex || null
-    // 行布局相同&非块元素时追加数据，否则新增分组
     if (
       currentRowFlex === rowFlex &&
       !getIsBlockElement(element) &&
@@ -1167,7 +1109,6 @@ export function groupElementListByRowFlex(
       currentRowFlex = rowFlex
     }
   }
-  // 压缩数据
   for (let g = 0; g < elementListGroupList.length; g++) {
     const elementListGroup = elementListGroupList[g]
     elementListGroup.data = zipElementList(elementListGroup.data)
@@ -1184,14 +1125,12 @@ export function createDomFromElementList(
     const clipboardDom = document.createElement('div')
     for (let e = 0; e < payload.length; e++) {
       const element = payload[e]
-      // 构造表格
       if (element.type === ElementType.TABLE) {
         const tableDom: HTMLTableElement = document.createElement('table')
         tableDom.setAttribute('cellSpacing', '0')
         tableDom.setAttribute('cellpadding', '0')
         tableDom.setAttribute('border', '0')
         const borderStyle = '1px solid #000000'
-        // 表格边框
         if (!element.borderType || element.borderType === TableBorder.ALL) {
           tableDom.style.borderTop = borderStyle
           tableDom.style.borderLeft = borderStyle
@@ -1223,7 +1162,6 @@ export function createDomFromElementList(
             tdDom.colSpan = td.colspan
             tdDom.rowSpan = td.rowspan
             tdDom.style.verticalAlign = td.verticalAlign || 'top'
-            // 单元格边框
             if (td.borderTypes?.includes(TdBorder.TOP)) {
               tdDom.style.borderTop = borderStyle
             }
@@ -1267,7 +1205,6 @@ export function createDomFromElementList(
         if (element.listStyle) {
           list.style.listStyleType = listStyleCSSMapping[element.listStyle]
         }
-        // 按照换行符拆分
         const zipList = zipElementList(element.valueList!)
         const listElementListMap = splitListElement(zipList)
         listElementListMap.forEach(listElementList => {
@@ -1364,7 +1301,6 @@ export function createDomFromElementList(
         }
         if (!text) continue
         const dom = convertElementToDom(element, editorOptions)
-        // 前一个元素是标题，移除首行换行符
         if (payload[e - 1]?.type === ElementType.TITLE) {
           text = text.replace(/^\n/, '')
         }
@@ -1374,16 +1310,13 @@ export function createDomFromElementList(
     }
     return clipboardDom
   }
-  // 按行布局分类创建dom
   const clipboardDom = document.createElement('div')
   const groupElementList = groupElementListByRowFlex(elementList)
   for (let g = 0; g < groupElementList.length; g++) {
     const elementGroupRowFlex = groupElementList[g]
-    // 行布局样式设置
     const isDefaultRowFlex =
       !elementGroupRowFlex.rowFlex ||
       elementGroupRowFlex.rowFlex === RowFlex.LEFT
-    // 块元素使用flex否则使用text-align
     const rowFlexDom = document.createElement('div')
     if (!isDefaultRowFlex) {
       const firstElement = elementGroupRowFlex.data[0]
@@ -1401,9 +1334,7 @@ export function createDomFromElementList(
         }
       }
     }
-    // 布局内容
     rowFlexDom.innerHTML = buildDom(elementGroupRowFlex.data).innerHTML
-    // 未设置行布局时无需行布局容器
     if (!isDefaultRowFlex) {
       clipboardDom.append(rowFlexDom)
     } else {
@@ -1435,25 +1366,20 @@ export function convertTextNodeToElement(
     italic: style.fontStyle.includes('italic'),
     size: Math.floor(parseFloat(style.fontSize))
   }
-  // 元素类型-默认文本
   if (anchorNode.nodeName === 'SUB' || style.verticalAlign === 'sub') {
     element.type = ElementType.SUBSCRIPT
   } else if (anchorNode.nodeName === 'SUP' || style.verticalAlign === 'super') {
     element.type = ElementType.SUPERSCRIPT
   }
-  // 行对齐
   if (rowFlex !== RowFlex.LEFT) {
     element.rowFlex = rowFlex
   }
-  // 高亮色
   if (style.backgroundColor !== 'rgba(0, 0, 0, 0)') {
     element.highlight = style.backgroundColor
   }
-  // 下划线
   if (style.textDecorationLine.includes('underline')) {
     element.underline = true
   }
-  // 删除线
   if (style.textDecorationLine.includes('line-through')) {
     element.strikeout = true
   }
@@ -1479,7 +1405,6 @@ export function getElementListByHTML(
       const childNodes = dom.childNodes
       for (let n = 0; n < childNodes.length; n++) {
         const node = childNodes[n]
-        // br元素与display:block元素需换行
         if (node.nodeName === 'BR') {
           elementList.push({
             value: '\n'
@@ -1605,7 +1530,6 @@ export function getElementListByHTML(
           }
           // colgroup
           const colElements = tableElement.querySelectorAll('colgroup col')
-          // 基础数据
           tableElement.querySelectorAll('tr').forEach(trElement => {
             const trHeightStr = Number(
               window.getComputedStyle(trElement).height.replace('px', '')
@@ -1637,7 +1561,6 @@ export function getElementListByHTML(
             element.trList!.push(tr)
           })
           if (element.trList!.length) {
-            // 列选项数据
             const tdCount = element.trList![0].tdList.reduce(
               (pre, cur) => pre + cur.colspan,
               0
@@ -1691,7 +1614,6 @@ export function getElementListByHTML(
       }
     }
   }
-  // 追加dom
   const clipboardDom = document.createElement('div')
   clipboardDom.innerHTML = htmlText
   document.body.appendChild(clipboardDom)
@@ -1702,9 +1624,7 @@ export function getElementListByHTML(
     }
   })
   deleteNodes.forEach(node => node.remove())
-  // 搜索文本节点
   findTextNode(clipboardDom)
-  // 移除dom
   clipboardDom.remove()
   return elementList
 }
@@ -1714,7 +1634,6 @@ export function getTextFromElementList(elementList: IElement[]) {
     let text = ''
     for (let e = 0; e < payload.length; e++) {
       const element = payload[e]
-      // 构造表格
       if (element.type === ElementType.TABLE) {
         text += `\n`
         const trList = element.trList!
@@ -1735,10 +1654,8 @@ export function getTextFromElementList(elementList: IElement[]) {
       } else if (element.type === ElementType.TITLE) {
         text += `${buildText(zipElementList(element.valueList!))}`
       } else if (element.type === ElementType.LIST) {
-        // 按照换行符拆分
         const zipList = zipElementList(element.valueList!)
         const listElementListMap = splitListElement(zipList)
-        // 无序列表前缀
         let ulListStyleText = ''
         if (element.listType === ListType.UL) {
           ulListStyleText =

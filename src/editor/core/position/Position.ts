@@ -130,9 +130,7 @@ export class Position {
     let index = startIndex
     for (let i = 0; i < rowList.length; i++) {
       const curRow = rowList[i]
-      // 行存在环绕的可能性均不设置行布局
       if (!curRow.isSurround) {
-        // 计算行偏移量（行居中、居右）
         const curRowWidth = curRow.width + (curRow.offsetX || 0)
         if (curRow.rowFlex === RowFlex.CENTER) {
           x += (innerWidth - curRowWidth) / 2
@@ -140,10 +138,8 @@ export class Position {
           x += innerWidth - curRowWidth
         }
       }
-      // 当前行X/Y轴偏移量
       x += curRow.offsetX || 0
       y += curRow.offsetY || 0
-      // 当前td所在位置
       const tablePreX = x
       const tablePreY = y
       for (let j = 0; j < curRow.elementList.length; j++) {
@@ -156,11 +152,9 @@ export class Position {
             element.type === ElementType.LATEX)
             ? curRow.ascent - metrics.height
             : curRow.ascent
-        // 偏移量（内部计算使用）
         if (element.left) {
           x += element.left
         }
-        // 偏移量（外部传入）
         if (element.translateX) {
           x += element.translateX * scale
         }
@@ -183,19 +177,16 @@ export class Position {
             rightBottom: [x + metrics.width, y + curRow.height]
           }
         }
-        // 缓存浮动元素信息
         if (
           element.imgDisplay === ImageDisplay.SURROUND ||
           element.imgDisplay === ImageDisplay.FLOAT_TOP ||
           element.imgDisplay === ImageDisplay.FLOAT_BOTTOM
         ) {
-          // 浮动元素使用上一位置信息
           const prePosition = positionList[positionList.length - 1]
           if (prePosition) {
             positionItem.metrics = prePosition.metrics
             positionItem.coordinate = prePosition.coordinate
           }
-          // 兼容浮动元素初始坐标为空的情况-默认使用左上坐标
           if (!element.imgFloatPosition) {
             element.imgFloatPosition = {
               x,
@@ -218,7 +209,6 @@ export class Position {
         positionList.push(positionItem)
         index++
         x += metrics.width
-        // 计算表格内元素位置
         if (element.type === ElementType.TABLE && !element.hide) {
           const tdPaddingWidth = tdPadding[1] + tdPadding[3]
           const tdPaddingHeight = tdPadding[0] + tdPadding[2]
@@ -246,7 +236,6 @@ export class Position {
                 trIndex: t,
                 zone
               })
-              // 垂直对齐方式
               if (
                 td.verticalAlign === VerticalAlign.MIDDLE ||
                 td.verticalAlign === VerticalAlign.BOTTOM
@@ -277,7 +266,6 @@ export class Position {
               y = drawRowResult.y
             }
           }
-          // 恢复初始x、y
           x = tablePreX
           y = tablePreY
         }
@@ -289,14 +277,11 @@ export class Position {
   }
 
   public computePositionList() {
-    // 置空原位置信息
     this.positionList = []
-    // 按每页行计算
     const innerWidth = this.draw.getInnerWidth()
     const pageRowList = this.draw.getPageRowList()
     const margins = this.draw.getMargins()
     const startX = margins[3]
-    // 起始位置受页眉影响
     const header = this.draw.getHeader()
     const extraHeight = header.getExtraHeight()
     const startY = margins[0] + extraHeight
@@ -370,7 +355,6 @@ export class Position {
     const curPageNo = payload.pageNo ?? this.draw.getPageNo()
     const isMainActive = zoneManager.isMainActive()
     const positionNo = isMainActive ? curPageNo : 0
-    // 验证浮于文字上方元素
     if (!isTable) {
       const floatTopPosition = this.getFloatPositionByXY({
         ...payload,
@@ -378,7 +362,6 @@ export class Position {
       })
       if (floatTopPosition) return floatTopPosition
     }
-    // 普通元素
     for (let j = 0; j < positionList.length; j++) {
       const {
         index,
@@ -389,7 +372,6 @@ export class Position {
       } = positionList[j]
       if (positionNo !== pageNo) continue
       if (pageNo > positionNo) break
-      // 命中元素
       if (
         leftTop[0] - left <= x &&
         rightTop[0] >= x &&
@@ -398,7 +380,6 @@ export class Position {
       ) {
         let curPositionIndex = j
         const element = elementList[j]
-        // 表格被命中
         if (element.type === ElementType.TABLE) {
           for (let t = 0; t < element.trList!.length; t++) {
             const tr = element.trList![t]
@@ -443,7 +424,6 @@ export class Position {
             }
           }
         }
-        // 图片区域均为命中
         if (
           element.type === ElementType.IMAGE ||
           element.type === ElementType.LATEX
@@ -464,7 +444,6 @@ export class Position {
             isCheckbox: true
           }
         }
-        // 标签元素检测
         if (element.type === ElementType.LABEL) {
           return {
             index: curPositionIndex,
@@ -476,7 +455,6 @@ export class Position {
           element.type === ElementType.TAB &&
           element.listStyle === ListStyle.CHECKBOX
         ) {
-          // 向前找checkbox元素
           let index = curPositionIndex - 1
           while (index > 0) {
             const element = elementList[index]
@@ -505,7 +483,6 @@ export class Position {
           }
         }
         let hitLineStartIndex: number | undefined
-        // 判断是否在文字中间前后
         if (elementList[index].value !== ZERO) {
           const valueWidth = rightTop[0] - leftTop[0]
           if (x < leftTop[0] + valueWidth / 2) {
@@ -523,7 +500,6 @@ export class Position {
         }
       }
     }
-    // 验证衬于文字下方元素
     if (!isTable) {
       const floatBottomPosition = this.getFloatPositionByXY({
         ...payload,
@@ -531,11 +507,9 @@ export class Position {
       })
       if (floatBottomPosition) return floatBottomPosition
     }
-    // 非命中区域
     let isLastArea = false
     let curPositionIndex = -1
     let hitLineStartIndex: number | undefined
-    // 判断是否在表格内
     if (isTable) {
       const { scale } = this.options
       const { td, tablePosition } = payload
@@ -552,7 +526,6 @@ export class Position {
         }
       }
     }
-    // 判断所属行是否存在元素
     const lastLetterList = positionList.filter(
       p => p.isLastLetter && p.pageNo === positionNo
     )
@@ -568,13 +541,11 @@ export class Position {
         )
         const headElement = elementList[headIndex]
         const headPosition = positionList[headIndex]
-        // 是否在头部
         const headStartX =
           headElement.listStyle === ListStyle.CHECKBOX
             ? this.draw.getMargins()[3]
             : headPosition.coordinate.leftTop[0]
         if (x < headStartX) {
-          // 头部元素为空元素时无需选中
           if (~headIndex) {
             if (headPosition.value === ZERO) {
               curPositionIndex = headIndex
@@ -586,7 +557,6 @@ export class Position {
             curPositionIndex = index
           }
         } else {
-          // 是否是复选框列表
           if (headElement.listStyle === ListStyle.CHECKBOX && x < leftTop[0]) {
             return {
               index: headIndex,
@@ -601,27 +571,21 @@ export class Position {
       }
     }
     if (!isLastArea) {
-      // 页眉页脚正文切换
       if (this.draw.getIsPagingMode()) {
-        // 页眉底部距离页面顶部距离
         const header = this.draw.getHeader()
         const headerHeight = header.getHeight()
         const headerBottomY = header.getHeaderTop() + headerHeight
-        // 页脚上部距离页面顶部距离
         const footer = this.draw.getFooter()
         const pageHeight = this.draw.getHeight()
         const footerTopY =
           pageHeight - (footer.getFooterBottom() + footer.getHeight())
-        // 判断所属位置是否属于页眉页脚区域
         if (isMainActive) {
-          // 页眉：当前位置小于页眉底部位置
           if (y < headerBottomY) {
             return {
               index: -1,
               zone: EditorZone.HEADER
             }
           }
-          // 页脚：当前位置大于页脚顶部位置
           if (y > footerTopY) {
             return {
               index: -1,
@@ -629,7 +593,6 @@ export class Position {
             }
           }
         } else {
-          // main区域：当前位置小于页眉底部位置 && 大于页脚顶部位置
           if (y <= footerTopY && y >= headerBottomY) {
             return {
               index: -1,
@@ -638,14 +601,12 @@ export class Position {
           }
         }
       }
-      // 正文上-循环首行
       const margins = this.draw.getMargins()
       if (y <= margins[0]) {
         for (let p = 0; p < positionList.length; p++) {
           const position = positionList[p]
           if (position.pageNo !== positionNo || position.rowNo !== 0) continue
           const { leftTop, rightTop } = position.coordinate
-          // 小于左页边距 || 命中文字 || 首行最后元素
           if (
             x <= margins[3] ||
             (x >= leftTop[0] && x <= rightTop[0]) ||
@@ -657,7 +618,6 @@ export class Position {
           }
         }
       } else {
-        // 正文下-循环尾行
         const lastLetter = lastLetterList[lastLetterList.length - 1]
         if (lastLetter) {
           const lastRowNo = lastLetter.rowNo
@@ -670,7 +630,6 @@ export class Position {
               continue
             }
             const { leftTop, rightTop } = position.coordinate
-            // 小于左页边距 || 命中文字 || 尾行最后元素
             if (
               x <= margins[3] ||
               (x >= leftTop[0] && x <= rightTop[0]) ||
@@ -683,7 +642,6 @@ export class Position {
           }
         }
       }
-      // 当前页最后一行
       return {
         index:
           lastLetterList[lastLetterList.length - 1]?.index ||
@@ -763,7 +721,6 @@ export class Position {
   ): ICurrentPosition | null {
     const positionResult = this.getPositionByXY(payload)
     if (!~positionResult.index) return null
-    // 移动控件内光标
     if (
       positionResult.isControl &&
       this.draw.getMode() !== EditorMode.READONLY
@@ -798,7 +755,6 @@ export class Position {
       trId,
       tableId
     } = positionResult
-    // 设置位置上下文
     this.setPositionContext({
       isTable: isTable || false,
       isCheckbox: isCheckbox || false,
@@ -847,16 +803,12 @@ export class Position {
         }
         if (isRectIntersect(rowElementRect, surroundRect)) {
           row.isSurround = true
-          // 需向左移动距离：浮动元素宽度 + 浮动元素左上坐标 - 元素左上坐标
           const translateX =
             surroundRect.width + surroundRect.x - rowElementRect.x
           rowElement.left = translateX
-          // 增加行宽
           row.width += translateX
           rowIncreaseWidth += translateX
-          // 下个元素起始位置：浮动元素右坐标 - 元素宽度
           x = surroundRect.x + surroundRect.width
-          // 检测宽度是否足够，不够则移动到下一行，并还原状态
           if (row.width + rowElement.metrics.width > availableWidth) {
             rowElement.left = 0
             row.width -= rowIncreaseWidth

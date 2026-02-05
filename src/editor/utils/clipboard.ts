@@ -51,18 +51,15 @@ export async function writeClipboardItem(
     // add new range
     const selection = window.getSelection()
     const range = document.createRange()
-    // 增加尾行换行字符避免dom复制缺失
     const br = document.createElement('span')
     br.innerText = '\n'
     fakeElement.append(br)
-    // 扩选选区并执行复制
     range.selectNodeContents(fakeElement)
     selection?.removeAllRanges()
     selection?.addRange(range)
     document.execCommand('copy')
     fakeElement.remove()
   }
-  // 编辑器结构化数据
   setClipboardData({ text, elementList })
 }
 
@@ -71,10 +68,8 @@ export async function writeElementList(
   options: DeepRequired<IEditorOption>
 ) {
   const clipboardDom = createDomFromElementList(elementList, options)
-  // 写入剪贴板
   document.body.append(clipboardDom)
   const text = clipboardDom.innerText
-  // 先追加后移除，否则innerText无法解析换行符
   clipboardDom.remove()
   const html = clipboardDom.innerHTML
   if (!text && !html && !elementList.length) return

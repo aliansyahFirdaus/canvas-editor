@@ -29,7 +29,6 @@ export class ZoneTip {
     this.tipContent = tipContent
     this.isDisableMouseMove = true
     this.currentMoveZone = EditorZone.MAIN
-    // 监听区域
     const watchZones: EditorZone[] = []
     const { header, footer } = draw.getOptions()
     if (!header.disabled) {
@@ -56,7 +55,6 @@ export class ZoneTip {
             return
           }
           this.currentMoveZone = mousemoveZone
-          // 激活区域是正文，移动区域是页眉、页脚时绘制
           this._updateZoneTip(
             this.zone.getZone() === EditorZone.MAIN &&
               (mousemoveZone === EditorZone.HEADER ||
@@ -69,7 +67,6 @@ export class ZoneTip {
         }
       }, 250)
     )
-    // mouseenter后mousemove有效，避免因节流导致的mouseleave后继续执行逻辑
     this.pageContainer.addEventListener('mouseenter', () => {
       this.isDisableMouseMove = false
     })

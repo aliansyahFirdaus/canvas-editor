@@ -379,7 +379,6 @@ export function normalizeLineBreak(text: string): string {
   return text.replace(/\r\n|\r/g, '\n')
 }
 
-// 支持正则的indexOf
 export function indexOf(
   source: string,
   search: string | RegExp,
@@ -394,7 +393,6 @@ export function indexOf(
     return { index: -1, length: 0 }
   }
 
-  // 关键词匹配
   if (typeof search === 'string') {
     if (search === '') {
       return { index: start, length: 0 }
@@ -405,7 +403,6 @@ export function indexOf(
       : { index, length: search.length }
   }
 
-  // 确保正则包含 "g" 才可以设置 lastIndex，从而从任意位置开始搜索
   const originalFlags = search.flags
   const flags = originalFlags.includes('g')
     ? originalFlags
@@ -419,7 +416,6 @@ export function indexOf(
   return { index: match.index, length: match[0].length }
 }
 
-// 滚动到可视视野范围
 export function scrollIntoView(container: HTMLElement, selected: HTMLElement) {
   if (!selected) {
     container.scrollTop = 0

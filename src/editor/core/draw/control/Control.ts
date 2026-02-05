@@ -103,7 +103,6 @@ export class Control {
     this.preElement = null
   }
 
-  // 搜索高亮匹配
   public setHighlightList(payload: IControlHighlight[]) {
     this.controlSearch.setHighlightList(payload)
   }
@@ -126,7 +125,6 @@ export class Control {
     return this.draw
   }
 
-  // 过滤控件辅助元素（前后缀、背景提示）
   public filterAssistElement(elementList: IElement[]): IElement[] {
     return elementList.filter((element, index) => {
       if (element.type === ElementType.TABLE) {
@@ -149,7 +147,6 @@ export class Control {
           return true
         }
       } else {
-        // 控件存在值时无需过滤前后文本
         if (
           element.control?.preText &&
           element.controlComponent === ControlComponent.PRE_TEXT
@@ -193,21 +190,18 @@ export class Control {
     })
   }
 
-  // 是否属于控件可以捕获事件的选区
   public getIsRangeCanCaptureEvent(): boolean {
     if (!this.activeControl) return false
     const { startIndex, endIndex } = this.getRange()
     if (!~startIndex && !~endIndex) return false
     const elementList = this.getElementList()
     const startElement = elementList[startIndex]
-    // 闭合光标在后缀处
     if (
       startIndex === endIndex &&
       startElement.controlComponent === ControlComponent.POSTFIX
     ) {
       return true
     }
-    // 在控件内
     const endElement = elementList[endIndex]
     if (
       startElement.controlId &&
@@ -219,7 +213,6 @@ export class Control {
     return false
   }
 
-  // 判断选区是否在后缀处
   public getIsRangeInPostfix(): boolean {
     if (!this.activeControl) return false
     const { startIndex, endIndex } = this.getRange()
@@ -229,7 +222,6 @@ export class Control {
     return element.controlComponent === ControlComponent.POSTFIX
   }
 
-  // 判断选区是否在控件内
   public getIsRangeWithinControl(): boolean {
     const { startIndex, endIndex } = this.getRange()
     if (!~startIndex && !~endIndex) return false
@@ -246,7 +238,6 @@ export class Control {
     return false
   }
 
-  // 是否元素包含完整控件元素
   public getIsElementListContainFullControl(elementList: IElement[]): boolean {
     if (!elementList.some(element => element.controlId)) return false
     let prefixCount = 0
@@ -289,29 +280,24 @@ export class Control {
     return !!this.activeControl.getElement()?.control?.pasteDisabled
   }
 
-  // 通过索引找到控件并判断控件是否存在值
   public getIsExistValueByElementListIndex(
     elementList: IElement[],
     index: number
   ): boolean {
     const element = elementList[index]
-    // 是否是控件
     if (!element.controlId) return false
-    // 单选框、复选框仅需验证控件值
     if (
       element.control?.type === ControlType.CHECKBOX ||
       element.control?.type === ControlType.RADIO
     ) {
       return !!element.control?.code
     }
-    // 其他控件需校验文本
     if (element.controlComponent === ControlComponent.VALUE) {
       return true
     }
     if (element.controlComponent === ControlComponent.PLACEHOLDER) {
       return false
     }
-    // 向后查找值元素
     if (
       element.controlComponent === ControlComponent.PREFIX ||
       element.controlComponent === ControlComponent.PRE_TEXT
@@ -331,7 +317,6 @@ export class Control {
         i++
       }
     }
-    // 向前查找值元素
     if (
       element.controlComponent === ControlComponent.POSTFIX ||
       element.controlComponent === ControlComponent.POST_TEXT
@@ -387,7 +372,6 @@ export class Control {
     const elementList = context.elementList || this.getElementList()
     const { startIndex } = context.range || this.getRange()
     const startElement = elementList[startIndex]
-    // 向左查找
     let preIndex = startIndex
     while (preIndex > 0) {
       const preElement = elementList[preIndex]
@@ -400,7 +384,6 @@ export class Control {
       }
       preIndex--
     }
-    // 向右查找
     let nextIndex = startIndex + 1
     while (nextIndex < elementList.length) {
       const nextElement = elementList[nextIndex]
@@ -434,7 +417,6 @@ export class Control {
     const startElement = elementList[startIndex]
     if (!startElement?.controlId) return []
     const data: IElement[] = []
-    // 向左查找
     let preIndex = startIndex
     while (preIndex > 0) {
       const preElement = elementList[preIndex]
@@ -442,7 +424,6 @@ export class Control {
       data.unshift(preElement)
       preIndex--
     }
-    // 向右查找
     let nextIndex = startIndex + 1
     while (nextIndex < elementList.length) {
       const nextElement = elementList[nextIndex]
@@ -487,9 +468,7 @@ export class Control {
     const elementList = this.getElementList()
     const range = this.getRange()
     const element = elementList[range.startIndex]
-    // 判断控件是否已经激活
     if (this.activeControl) {
-      // 弹窗类控件唤醒弹窗，后缀处移除弹窗
       if (
         this.activeControl instanceof SelectControl ||
         this.activeControl instanceof DateControl ||
@@ -501,19 +480,15 @@ export class Control {
           this.activeControl.awake()
         }
       }
-      // 相同控件元素
       if (this.preElement?.controlId === element.controlId) {
-        // 当前元素在尾部：控件失活事件
         if (element.controlComponent === ControlComponent.POSTFIX) {
           this.emitControlChange(ControlState.INACTIVE)
         } else if (
-          // 之前元素在尾部 && 当前不在尾部：控件激活事件
           this.preElement?.controlComponent === ControlComponent.POSTFIX
         ) {
           this.emitControlChange(ControlState.ACTIVE)
         }
       }
-      // 更新缓存控件数据
       const controlElement = this.activeControl.getElement()
       if (element.controlId === controlElement.controlId) {
         this.updateActiveControlValue()
@@ -521,9 +496,7 @@ export class Control {
         return
       }
     }
-    // 销毁旧激活控件
     this.destroyControl()
-    // 激活控件
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
     const control = element.control!
@@ -546,10 +519,8 @@ export class Control {
       this.activeControl = numberControl
       numberControl.awake()
     }
-    // 缓存控件数据
     this.updateActiveControlValue()
     this.preElement = element
-    // 激活控件回调
     if (element.controlComponent !== ControlComponent.POSTFIX) {
       this.emitControlChange(ControlState.ACTIVE)
     }
@@ -565,14 +536,12 @@ export class Control {
     ) {
       this.activeControl.destroy()
     }
-    // 销毁控件回调
     if (
       isEmitEvent &&
       this.preElement?.controlComponent !== ControlComponent.POSTFIX
     ) {
       this.emitControlChange(ControlState.INACTIVE)
     }
-    // 清空变量
     this.preElement = null
     this.activeControl = null
     this.activeControlValue = []
@@ -585,7 +554,6 @@ export class Control {
       isSubmitHistory = true,
       isSetCursor = true
     } = options
-    // 重新渲染
     if (curIndex === undefined) {
       this.range.clearRange()
       this.draw.render({
@@ -617,11 +585,9 @@ export class Control {
     const controlElement =
       options?.controlElement || this.activeControl?.getElement()
     if (!controlElement) return
-    // 控件被删除不触发事件
     const elementList = options?.context?.elementList || this.getElementList()
     const { startIndex } = options?.context?.range || this.getRange()
     if (!elementList[startIndex]?.controlId) return
-    // 格式化回调数据
     const controlValue =
       options?.controlValue || this.getControlElementList(options?.context)
     let control: IControl
@@ -671,14 +637,12 @@ export class Control {
     ) {
       return false
     }
-    // 向左查找
     let preIndex = startIndex
     while (preIndex > 0) {
       const preElement = elementList[preIndex]
       if (preElement.controlComponent !== ControlComponent.VALUE) break
       preIndex--
     }
-    // 向右查找
     let nextIndex = startIndex + 1
     while (nextIndex < elementList.length) {
       const nextElement = elementList[nextIndex]
@@ -716,7 +680,6 @@ export class Control {
     } else {
       element = elementList[index]
     }
-    // 隐藏元素移动光标
     if (element.hide || element.control?.hide || element.area?.hide) {
       const nonHideIndex = getNonHideElementIndex(elementList, newIndex)
       return {
@@ -724,15 +687,12 @@ export class Control {
         newElement: elementList[nonHideIndex]
       }
     }
-    // 控件内移动光标
     if (element.controlComponent === ControlComponent.VALUE) {
-      // VALUE-无需移动
       return {
         newIndex,
         newElement: element
       }
     } else if (element.controlComponent === ControlComponent.POSTFIX) {
-      // POSTFIX-移动到最后一个后缀字符后
       let startIndex = newIndex + 1
       while (startIndex < elementList.length) {
         const nextElement = elementList[startIndex]
@@ -748,7 +708,6 @@ export class Control {
       element.controlComponent === ControlComponent.PREFIX ||
       element.controlComponent === ControlComponent.PRE_TEXT
     ) {
-      // PREFIX或前文本-移动到最后一个前缀字符后
       let startIndex = newIndex + 1
       while (startIndex < elementList.length) {
         const nextElement = elementList[startIndex]
@@ -768,7 +727,6 @@ export class Control {
       element.controlComponent === ControlComponent.PLACEHOLDER ||
       element.controlComponent === ControlComponent.POST_TEXT
     ) {
-      // PLACEHOLDER或后文本-移动到第一个前缀或内容后
       let startIndex = newIndex - 1
       while (startIndex > 0) {
         const preElement = elementList[startIndex]
@@ -798,7 +756,6 @@ export class Control {
   ): number | null {
     const elementList = context.elementList || this.getElementList()
     const startElement = elementList[startIndex]
-    // 设计模式 || 元素隐藏 => 不验证删除权限
     if (
       !this.draw.isDesignMode() &&
       !startElement?.hide &&
@@ -807,7 +764,6 @@ export class Control {
     ) {
       const { deletable = true } = startElement.control!
       if (!deletable) return null
-      // 表单模式控件删除权限验证
       const mode = this.draw.getMode()
       if (
         mode === EditorMode.FORM &&
@@ -818,7 +774,6 @@ export class Control {
     }
     let leftIndex = -1
     let rightIndex = -1
-    // 向左查找
     let preIndex = startIndex
     while (preIndex > 0) {
       const preElement = elementList[preIndex]
@@ -828,7 +783,6 @@ export class Control {
       }
       preIndex--
     }
-    // 向右查找
     let nextIndex = startIndex + 1
     while (nextIndex < elementList.length) {
       const nextElement = elementList[nextIndex]
@@ -838,13 +792,11 @@ export class Control {
       }
       nextIndex++
     }
-    // 控件在最后
     if (nextIndex === elementList.length) {
       rightIndex = nextIndex - 1
     }
     if (!~leftIndex && !~rightIndex) return startIndex
     leftIndex = ~leftIndex ? leftIndex : 0
-    // 删除元素
     this.draw.spliceElementList(
       elementList,
       leftIndex + 1,
@@ -867,7 +819,6 @@ export class Control {
         const curElement = elementList[index]
         if (curElement.controlId !== startElement.controlId) break
         if (curElement.controlComponent === ControlComponent.PLACEHOLDER) {
-          // 删除占位符时替换前一个历史记录
           if (!isHasSubmitHistory) {
             isHasSubmitHistory = true
             this.draw.getHistoryManager().popUndo()
@@ -887,7 +838,6 @@ export class Control {
     const control = startElement.control!
     if (!control.placeholder) return
     const placeholderStrList = splitText(control.placeholder)
-    // 优先使用默认控件样式
     const anchorElementStyleAttr = pickObject(startElement, CONTROL_STYLE_ATTR)
     for (let p = 0; p < placeholderStrList.length; p++) {
       const value = placeholderStrList[p]
@@ -923,7 +873,6 @@ export class Control {
     const elementList = context.elementList || this.getElementList()
     const { startIndex } = context.range || this.getRange()
     const startElement = elementList[startIndex]
-    // 向左查找
     let preIndex = startIndex
     while (preIndex > 0) {
       const preElement = elementList[preIndex]
@@ -934,7 +883,6 @@ export class Control {
       }
       preIndex--
     }
-    // 向右查找
     let nextIndex = startIndex + 1
     while (nextIndex < elementList.length) {
       const nextElement = elementList[nextIndex]
@@ -970,7 +918,6 @@ export class Control {
       while (i < elementList.length) {
         const element = elementList[i]
         i++
-        // 表格下钻处理
         if (element.type === ElementType.TABLE) {
           const trList = element.trList!
           for (let r = 0; r < trList.length; r++) {
@@ -1069,13 +1016,11 @@ export class Control {
     if (!payload.length) return
     let isExistSet = false
     let isExistSubmitHistory = false
-    // 设置值
     const setValue = (elementList: IElement[]) => {
       let i = 0
       while (i < elementList.length) {
         const element = elementList[i]
         i++
-        // 表格下钻处理
         if (element.type === ElementType.TABLE) {
           const trList = element.trList!
           for (let r = 0; r < trList.length; r++) {
@@ -1087,7 +1032,6 @@ export class Control {
           }
         }
         if (!element.control) continue
-        // 获取设置值优先id、conceptId、areaId并于groupId组合设置
         const payloadItem = payload.find(
           p =>
             (!p.groupId || p.groupId === element.control?.groupId) &&
@@ -1097,20 +1041,17 @@ export class Control {
         )
         if (!payloadItem) continue
         const { value, isSubmitHistory = true } = payloadItem
-        // 只要存在一次保存历史均记录
         isExistSet = true
         if (isSubmitHistory) {
           isExistSubmitHistory = true
         }
         const { type } = element.control!
-        // 当前控件结束索引
         let currentEndIndex = i
         while (currentEndIndex < elementList.length) {
           const nextElement = elementList[currentEndIndex]
           if (nextElement.controlId !== element.controlId) break
           currentEndIndex++
         }
-        // 模拟光标选区上下文
         const fakeRange = {
           startIndex: i - 1,
           endIndex: currentEndIndex - 2
@@ -1199,13 +1140,10 @@ export class Control {
             text.clearValue(controlContext, controlRule)
           }
         }
-        // 控件值变更事件
         this.emitControlContentChange({
           context: controlContext
         })
-        // 模拟控件激活后销毁
         this.activeControl = null
-        // 修改后控件结束索引
         let newEndIndex = i
         while (newEndIndex < elementList.length) {
           const nextElement = elementList[newEndIndex]
@@ -1215,11 +1153,9 @@ export class Control {
         i = newEndIndex
       }
     }
-    // 销毁旧控件
     this.destroyControl({
       isEmitEvent: false
     })
-    // 页眉、内容区、页脚同时处理
     const data = [
       this.draw.getHeaderElementList(),
       this.draw.getOriginalMainElementList(),
@@ -1229,7 +1165,6 @@ export class Control {
       setValue(elementList)
     }
     if (isExistSet) {
-      // 不保存历史时需清空之前记录，避免还原
       if (!isExistSubmitHistory) {
         this.draw.getHistoryManager().recovery()
       }
@@ -1247,7 +1182,6 @@ export class Control {
       while (i < elementList.length) {
         const element = elementList[i]
         i++
-        // 表格下钻处理
         if (element.type === ElementType.TABLE) {
           const trList = element.trList!
           for (let r = 0; r < trList.length; r++) {
@@ -1259,7 +1193,6 @@ export class Control {
           }
         }
         if (!element.control) continue
-        // 获取设置值优先id、conceptId、areaId并于groupId组合设置
         const payloadItem = payload.find(
           p =>
             (!p.groupId || p.groupId === element.control?.groupId) &&
@@ -1269,7 +1202,6 @@ export class Control {
         )
         if (!payloadItem) continue
         const { extension } = payloadItem
-        // 设置值
         this.setControlProperties(
           {
             extension
@@ -1279,7 +1211,6 @@ export class Control {
             range: { startIndex: i, endIndex: i }
           }
         )
-        // 修改后控件结束索引
         let newEndIndex = i
         while (newEndIndex < elementList.length) {
           const nextElement = elementList[newEndIndex]
@@ -1319,7 +1250,6 @@ export class Control {
           }
         }
         if (!element.control) continue
-        // 获取设置值优先id、conceptId、areaId并于groupId组合设置
         const payloadItem = payload.find(
           p =>
             (!p.groupId || p.groupId === element.control?.groupId) &&
@@ -1333,7 +1263,6 @@ export class Control {
         if (isSubmitHistory) {
           isExistSubmitHistory = true
         }
-        // 设置属性
         this.setControlProperties(
           {
             ...element.control,
@@ -1345,14 +1274,12 @@ export class Control {
             range: { startIndex: i, endIndex: i }
           }
         )
-        // 控件默认样式
         CONTROL_STYLE_ATTR.forEach(key => {
           const controlStyleProperty = properties[key]
           if (controlStyleProperty) {
             Reflect.set(element, key, controlStyleProperty)
           }
         })
-        // 修改后控件结束索引
         let newEndIndex = i
         while (newEndIndex < elementList.length) {
           const nextElement = elementList[newEndIndex]
@@ -1362,7 +1289,6 @@ export class Control {
         i = newEndIndex
       }
     }
-    // 页眉页脚正文启动搜索
     const pageComponentData: IEditorData = {
       header: this.draw.getHeaderElementList(),
       main: this.draw.getOriginalMainElementList(),
@@ -1374,7 +1300,6 @@ export class Control {
       setProperties(elementList)
     }
     if (!isExistUpdate) return
-    // 强制更新
     for (const key in pageComponentData) {
       const pageComponentKey = <keyof Omit<IEditorData, 'graffiti'>>key
       const elementList = zipElementList(pageComponentData[pageComponentKey]!, {
@@ -1388,7 +1313,6 @@ export class Control {
       })
     }
     this.draw.setEditorData(pageComponentData)
-    // 不保存历史时需清空之前记录，避免还原
     if (!isExistSubmitHistory) {
       this.draw.getHistoryManager().recovery()
     }
@@ -1415,7 +1339,6 @@ export class Control {
           }
         }
         if (element.controlId) {
-          // 移除控件所在标题及列表上下文信息
           const controlElement = omitObject(element, [
             ...TITLE_CONTEXT_ATTR,
             ...LIST_CONTEXT_ATTR
@@ -1451,14 +1374,12 @@ export class Control {
     const positionContext = position.getPositionContext()
     if (!positionContext) return null
     const controlElement = this.activeControl.getElement()
-    // 获取上一个控件上下文本信息
     function getPreContext(
       elementList: IElement[],
       start: number
     ): INextControlContext | null {
       for (let e = start; e > 0; e--) {
         const element = elementList[e]
-        // 表格元素
         if (element.type === ElementType.TABLE) {
           const trList = element.trList || []
           for (let r = trList.length - 1; r >= 0; r--) {
@@ -1490,7 +1411,6 @@ export class Control {
         ) {
           continue
         }
-        // 找到尾部第一个非占位符元素
         let nextIndex = e
         while (nextIndex > 0) {
           const nextElement = elementList[nextIndex]
@@ -1512,7 +1432,6 @@ export class Control {
       }
       return null
     }
-    // 当前上下文控件信息
     const { startIndex } = this.range.getRange()
     const elementList = this.getElementList()
     const context = getPreContext(elementList, startIndex)
@@ -1524,7 +1443,6 @@ export class Control {
         nextIndex: context.nextIndex
       }
     }
-    // 控件在单元内时继续循环
     if (controlElement.tableId) {
       const originalElementList = this.draw.getOriginalElementList()
       const { index, trIndex, tdIndex } = positionContext
@@ -1552,7 +1470,6 @@ export class Control {
           }
         }
       }
-      // 跳出表格继续循环
       const context = getPreContext(originalElementList, index! - 1)
       if (context) {
         return {
@@ -1572,14 +1489,12 @@ export class Control {
     const positionContext = position.getPositionContext()
     if (!positionContext) return null
     const controlElement = this.activeControl.getElement()
-    // 获取下一个控件上下文本信息
     function getNextContext(
       elementList: IElement[],
       start: number
     ): INextControlContext | null {
       for (let e = start; e < elementList.length; e++) {
         const element = elementList[e]
-        // 表格元素
         if (element.type === ElementType.TABLE) {
           const trList = element.trList || []
           for (let r = 0; r < trList.length; r++) {
@@ -1622,7 +1537,6 @@ export class Control {
       }
       return null
     }
-    // 当前上下文控件信息
     const { endIndex } = this.range.getRange()
     const elementList = this.getElementList()
     const context = getNextContext(elementList, endIndex)
@@ -1634,7 +1548,6 @@ export class Control {
         nextIndex: context.nextIndex
       }
     }
-    // 控件在单元内时继续循环
     if (controlElement.tableId) {
       const originalElementList = this.draw.getOriginalElementList()
       const { index, trIndex, tdIndex } = positionContext
@@ -1662,7 +1575,6 @@ export class Control {
           }
         }
       }
-      // 跳出表格继续循环
       const context = getNextContext(originalElementList, index! + 1)
       if (context) {
         return {
@@ -1687,13 +1599,11 @@ export class Control {
     if (!context) return
     const { nextIndex, positionContext } = context
     const position = this.draw.getPosition()
-    // 设置上下文
     position.setPositionContext(positionContext)
     this.draw.getRange().replaceRange({
       startIndex: nextIndex,
       endIndex: nextIndex
     })
-    // 重新渲染并定位
     this.draw.render({
       curIndex: nextIndex,
       isCompute: false,
@@ -1707,20 +1617,17 @@ export class Control {
     if (!rowElement.control?.minWidth) return
     const { scale } = this.options
     const controlMinWidth = rowElement.control.minWidth * scale
-    // 设置首字符偏移量：如果控件内设置对齐方式&&存在设置最小宽度
     let controlFirstElement: IRowElement | null = null
     if (
       rowElement.control?.minWidth &&
       (rowElement.control?.rowFlex === RowFlex.CENTER ||
         rowElement.control?.rowFlex === RowFlex.RIGHT)
     ) {
-      // 计算当前控件内容宽度是否超出最小宽度设置
       let controlContentWidth = rowElement.metrics.width
       let controlElementIndex = row.elementList.length - 1
       while (controlElementIndex >= 0) {
         const controlRowElement = row.elementList[controlElementIndex]
         controlContentWidth += controlRowElement.metrics.width
-        // 找到首字符结束循环
         if (
           row.elementList[controlElementIndex - 1]?.controlComponent ===
           ControlComponent.PREFIX
@@ -1730,29 +1637,24 @@ export class Control {
         }
         controlElementIndex--
       }
-      // 计算首字符偏移量
       if (controlFirstElement) {
         if (controlContentWidth < controlMinWidth) {
           if (rowElement.control.rowFlex === RowFlex.CENTER) {
             controlFirstElement.left =
               (controlMinWidth - controlContentWidth) / 2
           } else if (rowElement.control.rowFlex === RowFlex.RIGHT) {
-            // 最小宽度 - 实际宽度 - 后缀元素宽度
             controlFirstElement.left =
               controlMinWidth - controlContentWidth - rowElement.metrics.width
           }
         }
       }
     }
-    // 设置后缀偏移量：消费小于实际最小宽度
     const extraWidth = controlMinWidth - controlRealWidth
     if (extraWidth > 0) {
       const controlFirstElementLeft = controlFirstElement?.left || 0
-      // 超出行宽时截断
       const rowRemainingWidth =
         availableWidth - row.width - rowElement.metrics.width
       const left = Math.min(rowRemainingWidth, extraWidth)
-      // 后缀偏移量需减去首字符的偏移量，避免重复偏移
       rowElement.left = left - controlFirstElementLeft
       row.width += left - controlFirstElementLeft
     }

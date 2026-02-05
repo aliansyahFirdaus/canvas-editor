@@ -16,7 +16,6 @@ export class ListParticle {
   private range: RangeManager
   private options: DeepRequired<IEditorOption>
 
-  // 非递增样式直接返回默认值
   private readonly UN_COUNT_STYLE_WIDTH = 20
   private readonly MEASURE_BASE_TEXT = '0'
   private readonly LIST_GAP = 10
@@ -32,10 +31,8 @@ export class ListParticle {
     if (isReadonly) return
     const { startIndex, endIndex } = this.range.getRange()
     if (!~startIndex && !~endIndex) return
-    // 需要改变的元素列表
     const changeElementList = this.range.getRangeParagraphElementList()
     if (!changeElementList || !changeElementList.length) return
-    // 如果包含列表则设置为取消列表
     const isUnsetList = changeElementList.find(
       el => el.listType === listType && el.listStyle === listStyle
     )
@@ -43,14 +40,12 @@ export class ListParticle {
       this.unsetList()
       return
     }
-    // 设置值
     const listId = getUUID()
     changeElementList.forEach(el => {
       el.listId = listId
       el.listType = listType
       el.listStyle = listStyle
     })
-    // 光标定位
     const isSetCursor = startIndex === endIndex
     const curIndex = isSetCursor ? endIndex : startIndex
     this.draw.render({ curIndex, isSetCursor })
@@ -61,12 +56,10 @@ export class ListParticle {
     if (isReadonly) return
     const { startIndex, endIndex } = this.range.getRange()
     if (!~startIndex && !~endIndex) return
-    // 需要改变的元素列表
     const changeElementList = this.range
       .getRangeParagraphElementList()
       ?.filter(el => el.listId)
     if (!changeElementList || !changeElementList.length) return
-    // 如果列表最后字符不是换行符则需插入换行符
     const elementList = this.draw.getElementList()
     const endElement = elementList[endIndex]
     if (endElement.listId) {
@@ -85,14 +78,12 @@ export class ListParticle {
         start++
       }
     }
-    // 取消设置
     changeElementList.forEach(el => {
       delete el.listId
       delete el.listType
       delete el.listStyle
       delete el.listWrap
     })
-    // 光标定位
     const isSetCursor = startIndex === endIndex
     const curIndex = isSetCursor ? endIndex : startIndex
     this.draw.render({ curIndex, isSetCursor })
@@ -113,7 +104,6 @@ export class ListParticle {
         curElementList.push(curElement)
       } else {
         if (curElement.listId && curElement.listId !== curListId) {
-          // 列表结束
           if (curElementList.length) {
             const width = this.getListStyleWidth(ctx, curElementList)
             listStyleMap.set(curListId!, width)
@@ -137,7 +127,6 @@ export class ListParticle {
   ): number {
     const { scale, checkbox } = this.options
     const startElement = listElementList[0]
-    // 非递增样式返回固定值
     if (
       startElement.listStyle &&
       startElement.listStyle !== ListStyle.DECIMAL
@@ -147,7 +136,6 @@ export class ListParticle {
       }
       return this.UN_COUNT_STYLE_WIDTH * scale
     }
-    // 计算列表数量
     const count = listElementList.reduce((pre, cur) => {
       if (cur.value === ZERO) {
         pre += 1
@@ -155,7 +143,6 @@ export class ListParticle {
       return pre
     }, 0)
     if (!count) return 0
-    // 以递增样式最大宽度为准
     const text = `${this.MEASURE_BASE_TEXT.repeat(String(count).length)}${
       KeyMap.PERIOD
     }`
@@ -179,7 +166,6 @@ export class ListParticle {
       if (element?.type !== ElementType.TAB) break
       tabWidth += defaultTabWidth * scale
     }
-    // 列表样式渲染
     const {
       coordinate: {
         leftTop: [startX, startY]
@@ -187,7 +173,6 @@ export class ListParticle {
     } = position
     const x = startX - offsetX! + tabWidth
     const y = startY + ascent
-    // 复选框样式特殊处理
     if (startElement.listStyle === ListStyle.CHECKBOX) {
       const { width, height, gap } = this.options.checkbox
       const checkboxRowElement: IRowElement = {

@@ -9,25 +9,19 @@ import { CanvasEvent } from '../CanvasEvent'
 
 export async function copy(host: CanvasEvent, options?: ICopyOption) {
   const draw = host.getDraw()
-  // 自定义粘贴事件
   const { copy } = draw.getOverride()
   if (copy) {
     const overrideResult = copy()
-    // 默认阻止默认事件
     if ((<IOverrideResult>overrideResult)?.preventDefault !== false) return
   }
   const rangeManager = draw.getRange()
-  // 光标闭合时复制整行
   let copyElementList: IElement[] | null = null
   const range = rangeManager.getRange()
   if (range.isCrossRowCol) {
-    // 原始表格信息
     const tableElement = rangeManager.getRangeTableElement()
     if (!tableElement) return
-    // 选区行列信息
     const rowCol = draw.getTableParticle().getRangeRowCol()
     if (!rowCol) return
-    // 构造表格
     const copyTableElement: IElement = {
       type: ElementType.TABLE,
       value: '',

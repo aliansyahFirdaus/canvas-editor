@@ -17,14 +17,11 @@ export function input(data: string, host: CanvasEvent) {
   const cursorPosition = position.getCursorPosition()
   if (!data || !cursorPosition) return
   const isComposing = host.isComposing
-  // 正在合成文本进行非输入操作
   if (isComposing && host.compositionInfo?.value === data) return
   const rangeManager = draw.getRange()
   if (!rangeManager.getIsCanInput()) return
-  // 移除合成前，缓存设置的默认样式设置
   const defaultStyle =
     rangeManager.getDefaultStyle() || host.compositionInfo?.defaultStyle || null
-  // 移除合成输入
   removeComposingInput(host)
   if (!isComposing) {
     const cursor = draw.getCursor()
@@ -33,7 +30,6 @@ export function input(data: string, host: CanvasEvent) {
   const { TEXT, HYPERLINK, SUBSCRIPT, SUPERSCRIPT, DATE, TAB } = ElementType
   const text = data.replaceAll(`\n`, ZERO)
   const { startIndex, endIndex } = rangeManager.getRange()
-  // 格式化元素
   const elementList = draw.getElementList()
   const copyElement = rangeManager.getRangeAnchorStyle(elementList, endIndex)
   if (!copyElement) return
@@ -47,7 +43,6 @@ export function input(data: string, host: CanvasEvent) {
       (!copyElement.title?.disabled && !copyElement.control?.disabled)
     ) {
       const nextElement = elementList[endIndex + 1]
-      // 文本、超链接、日期、上下标：复制所有信息（元素类型、样式、特殊属性）
       if (
         !copyElement.type ||
         copyElement.type === TEXT ||
@@ -57,7 +52,6 @@ export function input(data: string, host: CanvasEvent) {
         (copyElement.type === SUPERSCRIPT && nextElement?.type === SUPERSCRIPT)
       ) {
         EDITOR_ELEMENT_COPY_ATTR.forEach(attr => {
-          // 在分组外无需复制分组信息
           if (attr === 'groupIds' && !nextElement?.groupIds) return
           const value = copyElement[attr] as never
           if (value !== undefined) {
@@ -65,7 +59,6 @@ export function input(data: string, host: CanvasEvent) {
           }
         })
       }
-      // 仅复制样式：存在默认样式设置 || 无法匹配文本类元素时（TAB）
       if (defaultStyle || copyElement.type === TAB) {
         EDITOR_ELEMENT_STYLE_ATTR.forEach(attr => {
           const value =
@@ -82,7 +75,6 @@ export function input(data: string, host: CanvasEvent) {
     }
     return newElement
   })
-  // 控件-移除placeholder
   const control = draw.getControl()
   let curIndex: number
   if (control.getActiveControl() && control.getIsRangeWithinControl()) {

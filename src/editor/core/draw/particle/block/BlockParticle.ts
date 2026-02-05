@@ -39,7 +39,6 @@ export class BlockParticle {
     x: number,
     y: number
   ) {
-    // 优先使用缓存block
     const id = element.id!
     let cacheBlock = this.blockMap.get(id)
     if (!cacheBlock) {
@@ -47,7 +46,6 @@ export class BlockParticle {
       cacheBlock.render()
       this.blockMap.set(id, cacheBlock)
     }
-    // 打印模式截图，其他模式更新位置
     if (this.draw.isPrintMode()) {
       cacheBlock.snapshot(ctx, x, y)
     } else {

@@ -46,7 +46,6 @@ export class RadioParticle {
       scale
     } = this.options
     const { metrics, radio } = row.elementList[index]
-    // 垂直布局设置
     if (
       verticalAlign === VerticalAlign.TOP ||
       verticalAlign === VerticalAlign.MIDDLE
@@ -58,7 +57,6 @@ export class RadioParticle {
         if (nextElement.value !== ZERO && nextElement.value !== NBSP) break
         nextIndex++
       }
-      // 以后一个非空格元素为基准
       if (nextElement) {
         const {
           metrics: { boundingBoxAscent, boundingBoxDescent }
@@ -73,7 +71,6 @@ export class RadioParticle {
         }
       }
     }
-    // left top 四舍五入避免1像素问题
     const left = Math.round(x + gap * scale)
     const top = Math.round(y - metrics.height + lineWidth)
     const width = metrics.width - gap * 2 * scale
@@ -81,12 +78,10 @@ export class RadioParticle {
     ctx.save()
     ctx.beginPath()
     ctx.translate(0.5, 0.5)
-    // 边框
     ctx.strokeStyle = radio?.value ? fillStyle : strokeStyle
     ctx.lineWidth = lineWidth
     ctx.arc(left + width / 2, top + height / 2, width / 2, 0, Math.PI * 2)
     ctx.stroke()
-    // 填充选中色
     if (radio?.value) {
       ctx.beginPath()
       ctx.fillStyle = fillStyle

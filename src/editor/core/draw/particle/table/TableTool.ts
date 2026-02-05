@@ -16,20 +16,13 @@ interface IAnchorMouseDown {
 }
 
 export class TableTool {
-  // 单元格最小宽度
   private readonly MIN_TD_WIDTH = 20
-  // 行列工具相对表格偏移值
   private readonly ROW_COL_OFFSET = 18
-  // 快速添加行列工具宽度
   private readonly ROW_COL_QUICK_WIDTH = 16
-  // 快速添加行列工具偏移值
   private readonly ROW_COL_QUICK_OFFSET = 5
-  // 快速添加行列工具相对表格位置
   private readonly ROW_COL_QUICK_POSITION =
     this.ROW_COL_OFFSET + (this.ROW_COL_OFFSET - this.ROW_COL_QUICK_WIDTH) / 2
-  // 边框工具宽/高度
   private readonly BORDER_VALUE = 4
-  // 快速选择工具偏移值
   private readonly TABLE_SELECT_OFFSET = 20
 
   private draw: Draw
@@ -55,7 +48,6 @@ export class TableTool {
     this.position = draw.getPosition()
     this.range = draw.getRange()
     this.container = draw.getContainer()
-    // x、y轴
     this.toolRowContainer = null
     this.toolRowAddBtn = null
     this.toolColAddBtn = null
@@ -86,14 +78,11 @@ export class TableTool {
     const { isTable, index, trIndex, tdIndex } =
       this.position.getPositionContext()
     if (!isTable) return
-    // 销毁之前工具
     this.dispose()
     const elementList = this.draw.getOriginalElementList()
     const positionList = this.position.getOriginalPositionList()
     const element = elementList[index!]
-    // 表格工具配置禁用又非设计模式时不渲染
     if (element.tableToolDisabled && !this.draw.isDesignMode()) return
-    // 渲染所需数据
     const {
       scale,
       table: { overflow }
@@ -113,7 +102,6 @@ export class TableTool {
     const colIndex = td.colIndex
     const tableHeight = element.height! * scale
     const tableWidth = element.width! * scale
-    // 表格选择工具
     const tableSelectBtn = document.createElement('div')
     tableSelectBtn.classList.add(`${EDITOR_PREFIX}-table-tool__select`)
     tableSelectBtn.style.height = `${tableHeight * scale}`
@@ -122,13 +110,11 @@ export class TableTool {
     tableSelectBtn.style.transform = `translate(-${
       this.TABLE_SELECT_OFFSET * scale
     }px, ${-this.TABLE_SELECT_OFFSET * scale}px)`
-    // 快捷全选
     tableSelectBtn.onclick = () => {
       this.draw.getTableOperate().tableSelectAll()
     }
     this.container.append(tableSelectBtn)
     this.toolTableSelectBtn = tableSelectBtn
-    // 渲染行工具
     const rowHeightList = trList!.map(tr => tr.height)
     const rowContainer = document.createElement('div')
     rowContainer.classList.add(`${EDITOR_PREFIX}-table-tool__row`)
@@ -142,7 +128,6 @@ export class TableTool {
       if (r === rowIndex) {
         rowItem.classList.add('active')
       }
-      // 快捷行选择
       rowItem.onclick = () => {
         const tdList = this.draw
           .getTableParticle()
@@ -174,7 +159,6 @@ export class TableTool {
       }
       const rowItemAnchor = document.createElement('div')
       rowItemAnchor.classList.add(`${EDITOR_PREFIX}-table-tool__anchor`)
-      // 行高度拖拽开始
       rowItemAnchor.onmousedown = evt => {
         this._mousedown({
           evt,
@@ -191,7 +175,6 @@ export class TableTool {
     rowContainer.style.top = `${tableY}px`
     this.container.append(rowContainer)
     this.toolRowContainer = rowContainer
-    // 添加行按钮
     const rowAddBtn = document.createElement('div')
     rowAddBtn.classList.add(`${EDITOR_PREFIX}-table-tool__quick__add`)
     rowAddBtn.style.height = `${tableHeight * scale}`
@@ -200,7 +183,6 @@ export class TableTool {
     rowAddBtn.style.transform = `translate(-${
       this.ROW_COL_QUICK_POSITION * scale
     }px, ${this.ROW_COL_QUICK_OFFSET * scale}px)`
-    // 快捷添加行
     rowAddBtn.onclick = () => {
       this.position.setPositionContext({
         index,
@@ -213,7 +195,6 @@ export class TableTool {
     }
     this.container.append(rowAddBtn)
     this.toolRowAddBtn = rowAddBtn
-    // 渲染列工具
     const colWidthList = colgroup!.map(col => col.width)
     const colContainer = document.createElement('div')
     colContainer.classList.add(`${EDITOR_PREFIX}-table-tool__col`)
@@ -227,7 +208,6 @@ export class TableTool {
       if (c === colIndex) {
         colItem.classList.add('active')
       }
-      // 快捷列选择
       colItem.onclick = () => {
         const tdList = this.draw
           .getTableParticle()
@@ -259,7 +239,6 @@ export class TableTool {
       }
       const colItemAnchor = document.createElement('div')
       colItemAnchor.classList.add(`${EDITOR_PREFIX}-table-tool__anchor`)
-      // 列高度拖拽开始
       colItemAnchor.onmousedown = evt => {
         this._mousedown({
           evt,
@@ -276,7 +255,6 @@ export class TableTool {
     colContainer.style.top = `${tableY}px`
     this.container.append(colContainer)
     this.toolColContainer = colContainer
-    // 添加列按钮
     const colAddBtn = document.createElement('div')
     colAddBtn.classList.add(`${EDITOR_PREFIX}-table-tool__quick__add`)
     colAddBtn.style.height = `${tableHeight * scale}`
@@ -285,7 +263,6 @@ export class TableTool {
     colAddBtn.style.transform = `translate(${
       this.ROW_COL_QUICK_OFFSET * scale
     }px, -${this.ROW_COL_QUICK_POSITION * scale}px)`
-    // 快捷添加列
     colAddBtn.onclick = () => {
       this.position.setPositionContext({
         index,
@@ -298,7 +275,6 @@ export class TableTool {
     }
     this.container.append(colAddBtn)
     this.toolColAddBtn = colAddBtn
-    // 渲染单元格边框拖拽工具
     const borderContainer = document.createElement('div')
     borderContainer.classList.add(`${EDITOR_PREFIX}-table-tool__border`)
     borderContainer.style.height = `${tableHeight}px`
@@ -317,7 +293,6 @@ export class TableTool {
           (td.y! + td.height!) * scale - this.BORDER_VALUE / 2
         }px`
         rowBorder.style.left = `${td.x! * scale}px`
-        // 行宽度拖拽开始
         rowBorder.onmousedown = evt => {
           this._mousedown({
             evt,
@@ -335,7 +310,6 @@ export class TableTool {
         colBorder.style.left = `${
           (td.x! + td.width!) * scale - this.BORDER_VALUE / 2
         }px`
-        // 列高度拖拽开始
         colBorder.onmousedown = evt => {
           this._mousedown({
             evt,
@@ -345,7 +319,6 @@ export class TableTool {
           })
         }
         borderContainer.appendChild(colBorder)
-        // 首列开头拖拽（配置表格可以超出正文区域宽度时）
         if (overflow && td.colIndex === 0) {
           const colBorder = document.createElement('div')
           colBorder.classList.add(`${EDITOR_PREFIX}-table-tool__border__col`)
@@ -353,7 +326,6 @@ export class TableTool {
           colBorder.style.height = `${td.height! * scale}px`
           colBorder.style.top = `${td.y! * scale}px`
           colBorder.style.left = `${td.x! * scale - this.BORDER_VALUE / 2}px`
-          // 首列拖拽
           colBorder.onmousedown = evt => {
             this._mousedown({
               evt,
@@ -398,11 +370,9 @@ export class TableTool {
     this.mousedownY = evt.y
     const target = evt.target as HTMLDivElement
     const canvasRect = this.canvas.getBoundingClientRect()
-    // 改变光标
     const cursor = window.getComputedStyle(target).cursor
     document.body.style.cursor = cursor
     this.canvas.style.cursor = cursor
-    // 拖拽线
     let startX = 0
     let startY = 0
     const anchorLine = document.createElement('div')
@@ -422,7 +392,6 @@ export class TableTool {
     anchorLine.style.top = `${startY}px`
     this.container.append(anchorLine)
     this.anchorLine = anchorLine
-    // 追加全局事件
     let dx = 0
     let dy = 0
     const mousemoveFn = (evt: MouseEvent) => {
@@ -437,11 +406,9 @@ export class TableTool {
       'mouseup',
       () => {
         let isChangeSize = false
-        // 改变尺寸
         if (order === TableOrder.ROW) {
           const trList = element.trList!
           const tr = trList[index] || trList[index - 1]
-          // 最大移动高度-向上移动超出最小高度限定，则减少移动量
           const { defaultTrMinHeight } = this.options.table
           if (dy < 0 && tr.height + dy < defaultTrMinHeight) {
             dy = defaultTrMinHeight - tr.height
@@ -454,9 +421,7 @@ export class TableTool {
         } else {
           const { colgroup } = element
           if (colgroup && dx) {
-            // 第一列特殊处理：更改表格宽度并移动位置
             if (overflow && isLeftStartBorder) {
-              // 列减少宽度不能小于最小宽度
               if (colgroup[index].width - dx / scale <= this.MIN_TD_WIDTH) {
                 dx = (colgroup[index].width - this.MIN_TD_WIDTH) * scale
               }
@@ -465,14 +430,11 @@ export class TableTool {
               element.translateX = (element.translateX || 0) + dx / scale
               isChangeSize = true
             } else {
-              // 宽度分配
               const innerWidth = this.draw.getInnerWidth()
               const curColWidth = colgroup[index].width
-              // 最小移动距离计算-如果向左移动：使单元格小于最小宽度，则减少移动量
               if (dx < 0 && curColWidth + dx < this.MIN_TD_WIDTH) {
                 dx = this.MIN_TD_WIDTH - curColWidth
               }
-              // 最大移动距离计算-如果向右移动：使后面一个单元格小于最小宽度，则减少移动量
               const nextColWidth = colgroup[index + 1]?.width
               if (
                 dx > 0 &&
@@ -482,16 +444,13 @@ export class TableTool {
                 dx = nextColWidth - this.MIN_TD_WIDTH
               }
               const moveColWidth = curColWidth + dx
-              // 开始移动，只有表格的最后一列线才会改变表格的宽度，其他场景不用计算表格超出
               if (!overflow && index === colgroup.length - 1) {
                 let moveTableWidth = 0
                 for (let c = 0; c < colgroup.length; c++) {
                   const group = colgroup[c]
-                  // 下一列减去偏移量
                   if (c === index + 1) {
                     moveTableWidth -= dx
                   }
-                  // 当前列加上偏移量
                   if (c === index) {
                     moveTableWidth += moveColWidth
                   }
@@ -505,7 +464,6 @@ export class TableTool {
                 }
               }
               if (dx) {
-                // 当前列增加，后列减少
                 if (colgroup.length - 1 !== index) {
                   colgroup[index + 1].width -= dx / scale
                 }
@@ -518,7 +476,6 @@ export class TableTool {
         if (isChangeSize) {
           this.draw.render({ isSetCursor: false })
         }
-        // 还原副作用
         anchorLine.remove()
         document.removeEventListener('mousemove', mousemoveFn)
         document.body.style.cursor = ''

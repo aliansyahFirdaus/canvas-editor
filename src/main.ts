@@ -31,7 +31,6 @@ window.onload = function () {
   const isApple =
     typeof navigator !== 'undefined' && /Mac OS X/.test(navigator.userAgent)
 
-  // 1. 初始化编辑器
   const container = document.querySelector<HTMLDivElement>('.editor')!
   const instance = new Editor(
     container,
@@ -63,10 +62,8 @@ window.onload = function () {
     options
   )
   console.log('实例: ', instance)
-  // cypress使用
   Reflect.set(window, 'editor', instance)
 
-  // 菜单弹窗销毁
   window.addEventListener(
     'click',
     evt => {
@@ -79,7 +76,6 @@ window.onload = function () {
     }
   )
 
-  // 2. | 撤销 | 重做 | 格式刷 | 清除格式 |
   const undoDom = document.querySelector<HTMLDivElement>('.menu-item__undo')!
   undoDom.title = `撤销(${isApple ? '⌘' : 'Ctrl'}+Z)`
   undoDom.onclick = function () {
@@ -130,7 +126,6 @@ window.onload = function () {
       instance.command.executeFormat()
     }
 
-  // 3. | 字体 | 字体变大 | 字体变小 | 加粗 | 斜体 | 下划线 | 删除线 | 上标 | 下标 | 字体颜色 | 背景色 |
   const fontDom = document.querySelector<HTMLDivElement>('.menu-item__font')!
   const fontSelectDom = fontDom.querySelector<HTMLDivElement>('.select')!
   const fontOptionDom = fontDom.querySelector<HTMLDivElement>('.options')!
@@ -350,7 +345,6 @@ window.onload = function () {
     instance.command.executeList(listType, listStyle)
   }
 
-  // 4. | 表格 | 图片 | 超链接 | 分割线 | 水印 | 代码块 | 分隔符 | 控件 | 复选框 | LaTeX | 日期选择器
   const tableDom = document.querySelector<HTMLDivElement>('.menu-item__table')!
   const tablePanelContainer = document.querySelector<HTMLDivElement>(
     '.menu-item__table__collapse'
@@ -358,7 +352,6 @@ window.onload = function () {
   const tableClose = document.querySelector<HTMLDivElement>('.table-close')!
   const tableTitle = document.querySelector<HTMLDivElement>('.table-select')!
   const tablePanel = document.querySelector<HTMLDivElement>('.table-panel')!
-  // 绘制行列
   const tableCellList: HTMLDivElement[][] = []
   for (let i = 0; i < 10; i++) {
     const tr = document.createElement('tr')
@@ -375,24 +368,19 @@ window.onload = function () {
   }
   let colIndex = 0
   let rowIndex = 0
-  // 移除所有格选择
   function removeAllTableCellSelect() {
     tableCellList.forEach(tr => {
       tr.forEach(td => td.classList.remove('active'))
     })
   }
-  // 设置标题内容
   function setTableTitle(payload: string) {
     tableTitle.innerText = payload
   }
-  // 恢复初始状态
   function recoveryTable() {
-    // 还原选择样式、标题、选择行列
     removeAllTableCellSelect()
     setTableTitle('插入')
     colIndex = 0
     rowIndex = 0
-    // 隐藏panel
     tablePanelContainer.style.display = 'none'
   }
   tableDom.onclick = function () {
@@ -404,11 +392,9 @@ window.onload = function () {
     const rowMarginTop = 10
     const celMarginRight = 6
     const { offsetX, offsetY } = evt
-    // 移除所有选择
     removeAllTableCellSelect()
     colIndex = Math.ceil(offsetX / (celSize + celMarginRight)) || 1
     rowIndex = Math.ceil(offsetY / (celSize + rowMarginTop)) || 1
-    // 改变选择样式
     tableCellList.forEach((tr, trIndex) => {
       tr.forEach((td, tdIndex) => {
         if (tdIndex < colIndex && trIndex < rowIndex) {
@@ -416,14 +402,12 @@ window.onload = function () {
         }
       })
     })
-    // 改变表格标题
     setTableTitle(`${rowIndex}×${colIndex}`)
   }
   tableClose.onclick = function () {
     recoveryTable()
   }
   tablePanel.onclick = function () {
-    // 应用选择
     instance.command.executeInsertTable(rowIndex, colIndex)
     recoveryTable()
   }
@@ -438,7 +422,6 @@ window.onload = function () {
     const fileReader = new FileReader()
     fileReader.readAsDataURL(file)
     fileReader.onload = function () {
-      // 计算宽高
       const image = new Image()
       const value = fileReader.result as string
       image.src = value
@@ -1024,7 +1007,6 @@ window.onload = function () {
   dateDom.onclick = function () {
     console.log('date')
     dateDomOptionDom.classList.toggle('visible')
-    // 定位调整
     const bodyRect = document.body.getBoundingClientRect()
     const dateDomOptionRect = dateDomOptionDom.getBoundingClientRect()
     if (dateDomOptionRect.left + dateDomOptionRect.width > bodyRect.width) {
@@ -1034,7 +1016,6 @@ window.onload = function () {
       dateDomOptionDom.style.right = 'unset'
       dateDomOptionDom.style.left = '0px'
     }
-    // 当前日期
     const date = new Date()
     const year = date.getFullYear().toString()
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
@@ -1125,7 +1106,6 @@ window.onload = function () {
         const width = payload.find(p => p.name === 'width')?.value
         const height = payload.find(p => p.name === 'height')?.value
         if (!height) return
-        // 地址或HTML代码至少存在一项
         const src = payload.find(p => p.name === 'src')?.value
         const srcdoc = payload.find(p => p.name === 'srcdoc')?.value
         const block: IBlock = {
@@ -1157,7 +1137,6 @@ window.onload = function () {
     })
   }
 
-  // 5. | 搜索&替换 | 打印 |
   const searchCollapseDom = document.querySelector<HTMLDivElement>(
     '.menu-item__search__collapse'
   )!
@@ -1254,7 +1233,6 @@ window.onload = function () {
     instance.command.executePrint()
   }
 
-  // 6. 目录显隐 | 页面模式 | 纸张缩放 | 纸张大小 | 纸张方向 | 页边距 | 全屏 | 设置
   const editorOptionDom =
     document.querySelector<HTMLDivElement>('.editor-option')!
   editorOptionDom.onclick = function () {
@@ -1295,13 +1273,11 @@ window.onload = function () {
           const catalogItem = catalogItems[c]
           const catalogItemDom = document.createElement('div')
           catalogItemDom.classList.add('catalog-item')
-          // 渲染
           const catalogItemContentDom = document.createElement('div')
           catalogItemContentDom.classList.add('catalog-item__content')
           const catalogItemContentSpanDom = document.createElement('span')
           catalogItemContentSpanDom.innerText = catalogItem.name
           catalogItemContentDom.append(catalogItemContentSpanDom)
-          // 定位
           catalogItemContentDom.onclick = () => {
             instance.command.executeLocationCatalog(catalogItem.id)
           }
@@ -1309,7 +1285,6 @@ window.onload = function () {
           if (catalogItem.subCatalog && catalogItem.subCatalog.length) {
             appendCatalog(catalogItemDom, catalogItem.subCatalog)
           }
-          // 追加
           parent.append(catalogItemDom)
         }
       }
@@ -1364,7 +1339,6 @@ window.onload = function () {
       instance.command.executePageScaleAdd()
     }
 
-  // 纸张大小
   const paperSizeDom = document.querySelector<HTMLDivElement>('.paper-size')!
   const paperSizeDomOptionsDom =
     paperSizeDom.querySelector<HTMLDivElement>('.options')!
@@ -1376,14 +1350,12 @@ window.onload = function () {
     const paperType = li.dataset.paperSize!
     const [width, height] = paperType.split('*').map(Number)
     instance.command.executePaperSize(width, height)
-    // 纸张状态回显
     paperSizeDomOptionsDom
       .querySelectorAll('li')
       .forEach(child => child.classList.remove('active'))
     li.classList.add('active')
   }
 
-  // 纸张方向
   const paperDirectionDom =
     document.querySelector<HTMLDivElement>('.paper-direction')!
   const paperDirectionDomOptionsDom =
@@ -1395,14 +1367,12 @@ window.onload = function () {
     const li = evt.target as HTMLLIElement
     const paperDirection = li.dataset.paperDirection!
     instance.command.executePaperDirection(<PaperDirection>paperDirection)
-    // 纸张方向状态回显
     paperDirectionDomOptionsDom
       .querySelectorAll('li')
       .forEach(child => child.classList.remove('active'))
     li.classList.add('active')
   }
 
-  // 页面边距
   const paperMarginDom =
     document.querySelector<HTMLDivElement>('.paper-margin')!
   paperMarginDom.onclick = function () {
@@ -1463,7 +1433,6 @@ window.onload = function () {
     })
   }
 
-  // 全屏
   const fullscreenDom = document.querySelector<HTMLDivElement>('.fullscreen')!
   fullscreenDom.onclick = toggleFullscreen
   window.addEventListener('keydown', evt => {
@@ -1484,7 +1453,6 @@ window.onload = function () {
     }
   }
 
-  // 7. 编辑器使用模式
   let modeIndex = 0
   const modeList = [
     {
@@ -1518,13 +1486,10 @@ window.onload = function () {
   ]
   const modeElement = document.querySelector<HTMLDivElement>('.editor-mode')!
   modeElement.onclick = function () {
-    // 模式选择循环
     modeIndex === modeList.length - 1 ? (modeIndex = 0) : modeIndex++
-    // 设置模式
     const { name, mode } = modeList[modeIndex]
     modeElement.innerText = name
     instance.command.executeMode(mode)
-    // 设置菜单栏权限视觉反馈
     const isReadonly = mode === EditorMode.READONLY
     const enableMenuList = ['search', 'print']
     document.querySelectorAll<HTMLDivElement>('.menu-item>div').forEach(dom => {
@@ -1535,7 +1500,6 @@ window.onload = function () {
     })
   }
 
-  // 模拟批注
   const commentDom = document.querySelector<HTMLDivElement>('.comment')!
   async function updateComment() {
     const groupIds = await instance.command.getGroupIds()
@@ -1543,9 +1507,7 @@ window.onload = function () {
       const activeCommentDom = commentDom.querySelector<HTMLDivElement>(
         `.comment-item[data-id='${comment.id}']`
       )
-      // 编辑器是否存在对应成组id
       if (groupIds.includes(comment.id)) {
-        // 当前dom是否存在-不存在则追加
         if (!activeCommentDom) {
           const commentItem = document.createElement('div')
           commentItem.classList.add('comment-item')
@@ -1554,7 +1516,6 @@ window.onload = function () {
             instance.command.executeLocationGroup(comment.id)
           }
           commentDom.append(commentItem)
-          // 选区信息
           const commentItemTitle = document.createElement('div')
           commentItemTitle.classList.add('comment-item__title')
           commentItemTitle.append(document.createElement('span'))
@@ -1567,7 +1528,6 @@ window.onload = function () {
           }
           commentItemTitle.append(closeDom)
           commentItem.append(commentItemTitle)
-          // 基础信息
           const commentItemInfo = document.createElement('div')
           commentItemInfo.classList.add('comment-item__info')
           const commentItemInfoName = document.createElement('span')
@@ -1577,7 +1537,6 @@ window.onload = function () {
           commentItemInfo.append(commentItemInfoName)
           commentItemInfo.append(commentItemInfoDate)
           commentItem.append(commentItemInfo)
-          // 详细评论
           const commentItemContent = document.createElement('div')
           commentItemContent.classList.add('comment-item__content')
           commentItemContent.innerText = comment.content
@@ -1585,14 +1544,11 @@ window.onload = function () {
           commentDom.append(commentItem)
         }
       } else {
-        // 编辑器内不存在对应成组id则dom则移除
         activeCommentDom?.remove()
       }
     }
   }
-  // 8. 内部事件监听
   instance.listener.rangeStyleChange = function (payload) {
-    // 控件类型
     payload.type === ElementType.SUBSCRIPT
       ? subscriptDom.classList.add('active')
       : subscriptDom.classList.remove('active')
@@ -1615,7 +1571,6 @@ window.onload = function () {
       }
     }
 
-    // 富文本
     fontOptionDom
       .querySelectorAll<HTMLLIElement>('li')
       .forEach(li => li.classList.remove('active'))
@@ -1670,7 +1625,6 @@ window.onload = function () {
       highlightSpanDom.style.backgroundColor = '#ffff00'
     }
 
-    // 行布局
     leftDom.classList.remove('active')
     centerDom.classList.remove('active')
     rightDom.classList.remove('active')
@@ -1688,7 +1642,6 @@ window.onload = function () {
       leftDom.classList.add('active')
     }
 
-    // 行间距
     rowOptionDom
       .querySelectorAll<HTMLLIElement>('li')
       .forEach(li => li.classList.remove('active'))
@@ -1697,7 +1650,6 @@ window.onload = function () {
     )!
     curRowMarginDom.classList.add('active')
 
-    // 功能
     payload.undo
       ? undoDom.classList.remove('no-allow')
       : undoDom.classList.add('no-allow')
@@ -1708,7 +1660,6 @@ window.onload = function () {
       ? painterDom.classList.add('active')
       : painterDom.classList.remove('active')
 
-    // 标题
     titleOptionDom
       .querySelectorAll<HTMLLIElement>('li')
       .forEach(li => li.classList.remove('active'))
@@ -1723,7 +1674,6 @@ window.onload = function () {
       titleOptionDom.querySelector('li:first-child')!.classList.add('active')
     }
 
-    // 列表
     listOptionDom
       .querySelectorAll<HTMLLIElement>('li')
       .forEach(li => li.classList.remove('active'))
@@ -1742,7 +1692,6 @@ window.onload = function () {
       listDom.classList.remove('active')
     }
 
-    // 批注
     commentDom
       .querySelectorAll<HTMLDivElement>('.comment-item')
       .forEach(commentItemDom => {
@@ -1759,7 +1708,6 @@ window.onload = function () {
       }
     }
 
-    // 行列信息
     const rangeContext = instance.command.getRangeContext()
     if (rangeContext) {
       document.querySelector<HTMLSpanElement>('.row-no')!.innerText = `${
@@ -1802,7 +1750,6 @@ window.onload = function () {
       'page-break',
       'control'
     ]
-    // 菜单操作权限
     disableMenusInControlContext.forEach(menu => {
       const menuDom = document.querySelector<HTMLDivElement>(
         `.menu-item__${menu}`
@@ -1824,18 +1771,15 @@ window.onload = function () {
   }
 
   const handleContentChange = async function () {
-    // 字数
     const wordCount = await instance.command.getWordCount()
     document.querySelector<HTMLSpanElement>('.word-count')!.innerText = `${
       wordCount || 0
     }`
-    // 目录
     if (isCatalogShow) {
       nextTick(() => {
         updateCatalog()
       })
     }
-    // 批注
     nextTick(() => {
       updateComment()
     })
@@ -1847,7 +1791,6 @@ window.onload = function () {
     console.log('elementList: ', payload)
   }
 
-  // 9. 右键菜单注册
   instance.register.contextMenuList([
     {
       name: '批注',
@@ -1932,7 +1875,6 @@ window.onload = function () {
     }
   ])
 
-  // 10. 快捷键注册
   instance.register.shortcutList([
     {
       key: KeyMap.P,

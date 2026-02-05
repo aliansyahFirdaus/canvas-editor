@@ -76,25 +76,20 @@ export class Area {
 
   public insertArea(payload: IInsertAreaOption): string | null {
     const { id, value, area, position, range } = payload
-    // 切换至正文
     if (this.zone.getZone() !== EditorZone.MAIN) {
       this.zone.setZone(EditorZone.MAIN)
     }
-    // 跳出表格
     this.draw.getPosition().setPositionContext({
       isTable: false
     })
-    // 通过光标插入area && 不能在area内再次插入area
     if (range && !this.getActiveAreaId()) {
       const { startIndex, endIndex } = range
-      // 校验位置合法性
       const elementList = this.draw.getOriginalMainElementList()
       if (!elementList[startIndex] || !elementList[endIndex]) {
         return null
       }
       this.range.setRange(range.startIndex, range.endIndex)
     } else {
-      // 设置插入位置
       if (position === LocationPosition.BEFORE) {
         this.range.setRange(0, 0)
       } else {
@@ -134,21 +129,17 @@ export class Area {
       ctx.translate(0.5, 0.5)
       const firstPosition = pagePositionList[0]
       const lastPosition = pagePositionList[pagePositionList.length - 1]
-      // 起始位置
       const x = margins[3]
       const y = Math.ceil(firstPosition.coordinate.leftTop[1])
       const height = Math.ceil(lastPosition.coordinate.rightBottom[1] - y)
-      // 背景色
       if (area.backgroundColor) {
         ctx.fillStyle = area.backgroundColor
         ctx.fillRect(x, y, width, height)
       }
-      // 边框
       if (area.borderColor) {
         ctx.strokeStyle = area.borderColor
         ctx.strokeRect(x, y, width, height)
       }
-      // 提示词
       if (area.placeholder && positionList.length <= 1) {
         const placeholder = new Placeholder(this.draw)
         placeholder.render(ctx, {
@@ -212,24 +203,20 @@ export class Area {
     for (let e = 0; e < elementList.length; e++) {
       const element = elementList[e]
       if (options?.position === LocationPosition.OUTER_BEFORE) {
-        // 区域外面最前
         if (elementList[e + 1]?.areaId !== areaId) continue
       } else if (options?.position === LocationPosition.AFTER) {
-        // 区域内部最后
         if (
           !(element.areaId === areaId && elementList[e + 1]?.areaId !== areaId)
         ) {
           continue
         }
       } else if (options?.position === LocationPosition.OUTER_AFTER) {
-        // 区域外部最后
         if (
           !(element.areaId !== areaId && elementList[e - 1]?.areaId === areaId)
         ) {
           continue
         }
       } else {
-        // 区域内部最前
         if (element.areaId !== areaId) continue
       }
       const positionList = this.position.getOriginalMainPositionList()
@@ -252,10 +239,8 @@ export class Area {
     if (!areaInfo.area) {
       areaInfo.area = {}
     }
-    // 需要计算的属性
     let isCompute = false
     const computeProps: Array<keyof IArea> = ['top', 'hide']
-    // 循环设置
     Object.entries(payload.properties).forEach(([key, value]) => {
       if (isNonValue(value)) return
       const propKey = key as keyof IArea
@@ -275,7 +260,6 @@ export class Area {
     if (!areaId) return
     const areaInfo = this.areaInfoMap.get(areaId)
     if (!areaInfo) return
-    // 删除旧数据并替换新的格式化数据
     const { positionList } = areaInfo
     const elementList = this.draw.getOriginalMainElementList()
     const valueList = payload.value

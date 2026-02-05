@@ -6,7 +6,6 @@ export function positionContextChange(
   payload: IPositionContextChangePayload
 ) {
   const { value, oldValue } = payload
-  // 表格工具移除
   if (oldValue.isTable && !value.isTable) {
     draw.getTableTool().dispose()
   }

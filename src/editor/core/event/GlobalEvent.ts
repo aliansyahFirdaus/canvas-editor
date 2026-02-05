@@ -72,7 +72,6 @@ export class GlobalEvent {
 
   public clearSideEffect = (evt: Event) => {
     if (!this.cursor) return
-    // 编辑器内部dom
     const target = <Element>(evt?.composedPath()[0] || evt.target)
     const pageList = this.draw.getPageList()
     const innerEditorDom = findParent(
@@ -81,7 +80,6 @@ export class GlobalEvent {
       true
     )
     if (innerEditorDom) return
-    // 编辑器外部组件dom
     const outerEditorDom = findParent(
       target,
       (node: Node & Element) =>
@@ -108,10 +106,8 @@ export class GlobalEvent {
   }
 
   public watchCursorActive() {
-    // 选区闭合&实际光标移出光标代理
     if (!this.range.getIsCollapsed()) return
     setTimeout(() => {
-      // 将模拟光标变成失活显示状态
       if (!this.cursor?.getAgentIsActive()) {
         this.cursor?.drawCursor({
           isFocus: false,
@@ -122,7 +118,6 @@ export class GlobalEvent {
   }
 
   public setPageScale = (evt: WheelEvent) => {
-    // 设置禁用快捷键
     if (
       this.options.shortcutDisableKeys.includes(
         INTERNAL_SHORTCUT_KEY.PAGE_SCALE
@@ -130,18 +125,15 @@ export class GlobalEvent {
     ) {
       return
     }
-    // 仅在按下Ctrl键时生效
     if (!evt.ctrlKey) return
     evt.preventDefault()
     const { scale } = this.options
     if (evt.deltaY < 0) {
-      // 放大
       const nextScale = scale * 10 + 1
       if (nextScale <= 30) {
         this.draw.setPageScale(nextScale / 10)
       }
     } else {
-      // 缩小
       const nextScale = scale * 10 - 1
       if (nextScale >= 5) {
         this.draw.setPageScale(nextScale / 10)
@@ -151,7 +143,6 @@ export class GlobalEvent {
 
   private _handleVisibilityChange = () => {
     if (document.visibilityState === 'visible') {
-      // 页面可见时重新渲染激活页面
       const range = this.range.getRange()
       const isSetCursor =
         !!~range.startIndex &&

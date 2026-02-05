@@ -13,7 +13,6 @@ import { updown } from './updown'
 export function keydown(evt: KeyboardEvent, host: CanvasEvent) {
   if (host.isComposing) return
   const draw = host.getDraw()
-  // 键盘事件逻辑分发
   if (evt.key === KeyMap.Backspace) {
     backspace(evt, host)
   } else if (evt.key === KeyMap.Delete) {
@@ -55,9 +54,7 @@ export function keydown(evt: KeyboardEvent, host: CanvasEvent) {
     }
     evt.preventDefault()
   } else if (evt.key === KeyMap.ESC) {
-    // 退出格式刷
     host.clearPainterStyle()
-    // 退出页眉页脚编辑
     const zoneManager = draw.getZone()
     if (!zoneManager.isMainActive()) {
       zoneManager.setZone(EditorZone.MAIN)

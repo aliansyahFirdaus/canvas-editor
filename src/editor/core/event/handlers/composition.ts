@@ -8,9 +8,7 @@ function compositionstart(host: CanvasEvent) {
 
 function compositionend(host: CanvasEvent, evt: CompositionEvent) {
   host.isComposing = false
-  // 处理输入框关闭
   const draw = host.getDraw()
-  // 不存在值：删除合成输入
   if (!evt.data) {
     removeComposingInput(host)
     const rangeManager = draw.getRange()
@@ -20,9 +18,7 @@ function compositionend(host: CanvasEvent, evt: CompositionEvent) {
       isSubmitHistory: false
     })
   } else {
-    // 存在值：无法触发input事件需手动检测并触发渲染
     if (isFirefox) {
-      // 如果为0，火狐浏览器会在input事件之前执行导致重复输入
       setTimeout(() => {
         if (host.compositionInfo) {
           input(evt.data, host)
@@ -34,7 +30,6 @@ function compositionend(host: CanvasEvent, evt: CompositionEvent) {
       }
     }
   }
-  // 移除代理输入框数据
   const cursor = draw.getCursor()
   cursor.clearAgentDomValue()
 }

@@ -15,7 +15,6 @@ export class BaseBlock {
   private blockContainer: HTMLDivElement
   private blockItem: HTMLDivElement
   protected blockCache: Map<string, IFrameBlock | VideoBlock>
-  // 缩放业务
   private resizerMask: HTMLDivElement
   private resizerSelection: HTMLDivElement
   private resizerHandleList: HTMLDivElement[]
@@ -60,13 +59,11 @@ export class BaseBlock {
     const { scale, resizerColor } = this.options
     const blockItem = document.createElement('div')
     blockItem.classList.add(`${EDITOR_PREFIX}-block-item`)
-    // 拖拽边框
     const resizerSelection = document.createElement('div')
     resizerSelection.style.display = 'none'
     resizerSelection.classList.add(`${EDITOR_PREFIX}-resizer-selection`)
     resizerSelection.style.borderColor = resizerColor
     resizerSelection.style.borderWidth = `${scale}px`
-    // 拖拽点
     const resizerHandleList: HTMLDivElement[] = []
     for (let i = 0; i < 8; i++) {
       const handleDom = document.createElement('div')
@@ -78,12 +75,10 @@ export class BaseBlock {
       resizerSelection.append(handleDom)
       resizerHandleList.push(handleDom)
     }
-    // 拖拽元素遮盖（不遮盖影响mouseup事件执行）
     const resizerMask = document.createElement('div')
     resizerMask.classList.add(`${EDITOR_PREFIX}-resizer-mask`)
     resizerMask.style.display = 'none'
     blockItem.append(resizerMask)
-    // 光标进入block时显示拖拽边框
     blockItem.onmouseenter = () => {
       const isReadonly = this.draw.isReadonly()
       if (isReadonly) return
@@ -91,7 +86,6 @@ export class BaseBlock {
       this._updateResizerRect(width, height)
       resizerSelection.style.display = 'block'
     }
-    // 光标离开block时隐藏拖拽边框
     blockItem.onmouseleave = () => {
       if (this.isAllowResize) return
       resizerSelection.style.display = 'none'
@@ -135,16 +129,12 @@ export class BaseBlock {
     this.isAllowResize = true
     const target = evt.target as HTMLDivElement
     this.curHandleIndex = Number(target.dataset.index)
-    // 显示遮盖元素
     this.resizerMask.style.display = 'block'
-    // 改变光标样式
     const cursor = window.getComputedStyle(target).cursor
     document.body.style.cursor = cursor
     canvas.style.cursor = cursor
-    // 追加mousemove事件
     const mousemoveFn = this._mousemove.bind(this)
     document.addEventListener('mousemove', mousemoveFn)
-    // 追加mouseup事件
     document.addEventListener(
       'mouseup',
       () => {
@@ -156,7 +146,6 @@ export class BaseBlock {
         document.removeEventListener('mousemove', mousemoveFn)
         document.body.style.cursor = ''
         canvas.style.cursor = 'text'
-        // 更新文档
         this.draw.render()
       },
       {
@@ -217,16 +206,13 @@ export class BaseBlock {
         dx = this.mousedownX - evt.x
         break
     }
-    // 图片实际宽高（变化大小除掉缩放比例）
     const dw = this.getBlockWidth() + dx / scale
     const dh = this.element.height! + dy / scale
     if (dw <= 0 || dh <= 0) return
     this.width = dw
     this.height = dh
-    // 图片显示宽高
     const elementWidth = dw * scale
     const elementHeight = dh * scale
-    // 更新预览包围框尺寸
     this._updateResizerRect(elementWidth, elementHeight)
     this.blockItem.style.width = `${elementWidth}px`
     this.blockItem.style.height = `${elementHeight}px`
@@ -264,12 +250,10 @@ export class BaseBlock {
     const height = this.draw.getHeight()
     const pageGap = this.draw.getPageGap()
     const preY = pageNo * (height + pageGap)
-    // 尺寸
     const { metrics } = this.element
     this.blockItem.style.display = 'block'
     this.blockItem.style.width = `${metrics.width}px`
     this.blockItem.style.height = `${metrics.height}px`
-    // 位置
     this.blockItem.style.left = `${x}px`
     this.blockItem.style.top = `${preY + y}px`
   }

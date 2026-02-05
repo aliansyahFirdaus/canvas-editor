@@ -26,19 +26,16 @@ export class LabelParticle {
       }
     } = this.options
 
-    // 默认样式
     const backgroundColor =
       element.label?.backgroundColor || defaultBackgroundColor
     const color = element.label?.color || defaultColor
     const borderRadius = element.label?.borderRadius || defaultBorderRadius
     const padding = element.label?.padding || defaultPadding
 
-    // 设置字体大小
     ctx.save()
     ctx.font = element.style
     const { width, height, boundingBoxAscent } = element.metrics
 
-    // 绘制圆角矩形背景
     ctx.fillStyle = backgroundColor
     this._drawRoundedRect(
       ctx,
@@ -50,7 +47,6 @@ export class LabelParticle {
     )
     ctx.fill()
 
-    // 绘制文本
     ctx.fillStyle = color
     ctx.fillText(element.value, x + padding[3] * scale, y)
     ctx.restore()
