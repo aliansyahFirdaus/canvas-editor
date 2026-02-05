@@ -355,13 +355,13 @@ export class DatePicker {
     this.dom.title.now.innerText = `${year}${this.lang.year} ${String(
       month
     ).padStart(2, '0')}${this.lang.month}`
-    const curDate = new Date(year, month, 0) // 当月日期
-    const curDay = curDate.getDate() // 当月总天数
-    let curWeek = new Date(year, month - 1, 1).getDay() // 当月第一天星期几
+    const curDate = new Date(year, month, 0)
+    const curDay = curDate.getDate()
+    let curWeek = new Date(year, month - 1, 1).getDay()
     if (curWeek === 0) {
       curWeek = 7
     }
-    const preDay = new Date(year, month - 1, 0).getDate() // 上个月天数
+    const preDay = new Date(year, month - 1, 0).getDate()
     this.dom.day.innerHTML = ''
     const preStartDay = preDay - curWeek + 1
     for (let i = preStartDay; i <= preDay; i++) {

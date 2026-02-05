@@ -159,7 +159,7 @@ export class ControlSearch {
               ...result,
               ...rule,
               ...restArgs,
-              index: result.index + startIndex // 实际索引
+              index: result.index + startIndex
             }))
           )
         }

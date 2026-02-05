@@ -67,8 +67,8 @@ export function unzipElementList(elementList: IElement[]): IElement[] {
 }
 
 interface IFormatElementListOption {
-  isHandleFirstElement?: boolean // 根据上下文确定首字符处理逻辑（处理首字符补偿）
-  isForceCompensation?: boolean // 强制补偿字符
+  isHandleFirstElement?: boolean
+  isForceCompensation?: boolean
   editorOptions: DeepRequired<IEditorOption>
 }
 

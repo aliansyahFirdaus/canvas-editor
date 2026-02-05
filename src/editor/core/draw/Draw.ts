@@ -2038,7 +2038,7 @@ export class Draw {
           this.highlight.recordFillInfo(
             ctx,
             x - offsetX,
-            y + marginHeight - highlightMarginHeight, // 先减去行margin，再加上高亮margin
+            y + marginHeight - highlightMarginHeight,
             element.metrics.width + offsetX,
             curRow.height - 2 * marginHeight + 2 * highlightMarginHeight,
             highlight

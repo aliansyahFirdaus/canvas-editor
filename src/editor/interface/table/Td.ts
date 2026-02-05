@@ -28,9 +28,9 @@ export interface ITd {
   backgroundColor?: string
   borderTypes?: TdBorder[]
   slashTypes?: TdSlash[]
-  mainHeight?: number // 内容 + 内边距高度
-  realHeight?: number // 真实高度（包含跨列）
-  realMinHeight?: number // 真实最小高度（包含跨列）
-  disabled?: boolean // 内容不可编辑
-  deletable?: boolean // 内容不可删除
+  mainHeight?: number
+  realHeight?: number
+  realMinHeight?: number
+  disabled?: boolean
+  deletable?: boolean
 }

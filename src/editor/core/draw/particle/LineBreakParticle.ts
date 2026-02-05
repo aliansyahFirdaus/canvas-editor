@@ -7,7 +7,7 @@ export class LineBreakParticle {
   private options: DeepRequired<IEditorOption>
   public static readonly WIDTH = 12
   public static readonly HEIGHT = 9
-  public static readonly GAP = 3 // 距离左边间隙
+  public static readonly GAP = 3
 
   constructor(draw: Draw) {
     this.options = draw.getOptions()

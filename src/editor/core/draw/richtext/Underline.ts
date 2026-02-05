@@ -39,7 +39,7 @@ export class Underline extends AbstractRichText {
     startY: number,
     width: number
   ) {
-    const SPACING = 3 // 双实线间距
+    const SPACING = 3
     const endX = startX + width
     const endY = startY + SPACING * this.options.scale
     ctx.beginPath()
@@ -59,9 +59,9 @@ export class Underline extends AbstractRichText {
     width: number
   ) {
     const { scale } = this.options
-    const AMPLITUDE = 1.2 * scale // 振幅
-    const FREQUENCY = 1 / scale // 频率
-    const adjustY = startY + 2 * AMPLITUDE // 增加2倍振幅
+    const AMPLITUDE = 1.2 * scale
+    const FREQUENCY = 1 / scale
+    const adjustY = startY + 2 * AMPLITUDE
     ctx.beginPath()
     for (let x = 0; x < width; x++) {
       const y = AMPLITUDE * Math.sin(FREQUENCY * x)
@@ -77,7 +77,7 @@ export class Underline extends AbstractRichText {
     ctx.save()
     ctx.strokeStyle = this.fillColor || underlineColor
     ctx.lineWidth = scale
-    const adjustY = Math.floor(y + 2 * ctx.lineWidth) + 0.5 // +0.5从1处渲染，避免线宽度等于3
+    const adjustY = Math.floor(y + 2 * ctx.lineWidth) + 0.5
     switch (this.fillDecorationStyle) {
       case TextDecorationStyle.WAVY:
         this._drawWave(ctx, x, adjustY, width)

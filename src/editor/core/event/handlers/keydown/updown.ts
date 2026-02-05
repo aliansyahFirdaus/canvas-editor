@@ -241,8 +241,8 @@ export function updown(evt: KeyboardEvent, host: CanvasEvent) {
               const nextPositionIndex =
                 getNextPositionIndex({
                   positionList: tdPositionList,
-                  index: lastPosition.index + 1, // 虚拟起始位置+1（从左往右找）
-                  rowNo: lastPosition.rowNo - 1, // 虚拟起始行号-1（从下往上找）
+                  index: lastPosition.index + 1,
+                  rowNo: lastPosition.rowNo - 1,
                   isUp,
                   cursorX: curRightX
                 }) || lastPosition.index
@@ -266,8 +266,8 @@ export function updown(evt: KeyboardEvent, host: CanvasEvent) {
               const nextPositionIndex =
                 getNextPositionIndex({
                   positionList: tdPositionList,
-                  index: -1, // 虚拟起始位置-1（从右往左找）
-                  rowNo: -1, // 虚拟起始行号-1（从上往下找）
+                  index: -1,
+                  rowNo: -1,
                   isUp,
                   cursorX: curRightX
                 }) || 0

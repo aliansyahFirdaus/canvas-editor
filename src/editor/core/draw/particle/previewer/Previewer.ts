@@ -70,7 +70,7 @@ export class Previewer {
     this.height = 0
     this.mousedownX = 0
     this.mousedownY = 0
-    this.curHandleIndex = 0 // 默认右下角
+    this.curHandleIndex = 0
     this.previewerContainer = null
     this.previewerImage = null
   }
