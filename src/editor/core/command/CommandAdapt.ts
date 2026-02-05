@@ -193,7 +193,7 @@ export class CommandAdapt {
     const elementList = this.draw.getElementList()
     const { startIndex, endIndex } = this.range.getRange()
     const isCollapsed = startIndex === endIndex
-    // 首字符禁止删除
+    // Prevent deletion of first character
     if (
       isCollapsed &&
       elementList[startIndex].value === ZERO &&
@@ -635,7 +635,7 @@ export class CommandAdapt {
     if (isDisabled) return
     const selection = this.range.getSelectionElementList()
     if (selection?.length) {
-      // 没有设置下划线、当前与之前有一个设置不存在、文本装饰不一致时重设下划线
+      // Reset underline when not set, current/previous missing, or text decoration inconsistent
       const isSetUnderline = selection.some(
         s =>
           !s.underline ||
@@ -1203,7 +1203,7 @@ export class CommandAdapt {
     if (!~startIndex && !~endIndex) return
     const elementList = this.draw.getElementList()
     let curIndex = -1
-    // 光标存在分割线，则判断为修改线段逻辑
+    // If cursor is at separator, treat as modify segment logic
     const endElement = elementList[endIndex + 1]
     if (endElement && endElement.type === ElementType.SEPARATOR) {
       if (
@@ -1513,7 +1513,7 @@ export class CommandAdapt {
     const endElement = pickElementAttr(elementList[endIndex], {
       extraPickAttrs: ['id', 'controlComponent']
     })
-    // 页码信息、行信息
+    // Page info and row info
     const rowList = this.draw.getRowList()
     const positionList = this.position.getPositionList()
     const startPosition = positionList[startIndex]
@@ -1545,13 +1545,13 @@ export class CommandAdapt {
           : endPosition.index! - endRow.startIndex + 1
     }
 
-    // 坐标信息（相对编辑器书写区）
+    // Coordinate info (relative to editor writing area)
     const rangeRects: RangeRect[] = []
     const height = this.draw.getOriginalHeight()
     const pageGap = this.draw.getOriginalPageGap()
     const selectionPositionList = this.position.getSelectionPositionList()
     if (selectionPositionList) {
-      // 起始信息及x坐标
+      // Start info and x coordinate
       let currentRowNo: number | null = null
       let currentX = 0
       let rangeRect: RangeRect | null = null
@@ -1578,7 +1578,7 @@ export class CommandAdapt {
         } else {
           rangeRect!.width = rightTop[0] - currentX
         }
-        // 最后一个元素结束追加选区信息
+        // Append selection info at end of last element
         if (p === selectionPositionList.length - 1 && rangeRect) {
           rangeRects.push(rangeRect)
         }
@@ -1765,7 +1765,7 @@ export class CommandAdapt {
     const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
     if (isDisabled) return
     const { isReplace = true, ignoreContextKeys } = options
-    // 如果配置不替换时，需收缩选区至末尾
+    // If replace is not configured, need to shrink selection to end
     if (!isReplace) {
       this.range.shrinkRange()
     }
@@ -2124,7 +2124,7 @@ export class CommandAdapt {
     let isApply = false
     for (let i = 0; i < elementList.length; i++) {
       const element = elementList[i]
-      // 删除空行、行首空格
+      // Delete empty lines and leading spaces
       if (element.value === ZERO) {
         while (i + 1 < elementList.length) {
           const nextElement = elementList[i + 1]
@@ -2150,7 +2150,7 @@ export class CommandAdapt {
   public setHTML(payload: Partial<IEditorHTML>) {
     const { header, main, footer } = payload
     const innerWidth = this.draw.getOriginalInnerWidth()
-    // 不设置值时数据为undefined，避免覆盖当前数据
+    // Data is undefined when not set to avoid overwriting current data
     const getElementList = (htmlText?: string) =>
       htmlText !== undefined
         ? getElementListByHTML(htmlText, {
@@ -2318,7 +2318,7 @@ export class CommandAdapt {
             continue
           }
         } else {
-          // 控件内部最前（默认）
+          // Front inside control (default)
           if (
             (element.controlComponent !== ControlComponent.PREFIX &&
               element.controlComponent !== ControlComponent.PRE_TEXT) ||
@@ -2358,7 +2358,7 @@ export class CommandAdapt {
     for (const context of data) {
       const locationContext = location(context.elementList, context.zone)
       if (locationContext) {
-        // 设置区域、上下文、光标信息
+        // Set area, context, and cursor info
         this.setZone(locationContext.zone)
         this.position.setPositionContext(locationContext.positionContext)
         this.range.replaceRange(locationContext.range)
@@ -2423,7 +2423,7 @@ export class CommandAdapt {
           }
         }
         if (element?.title?.conceptId !== conceptId) continue
-        // 先查找到标题，后循环至同级或上级标题处停止
+        // First find the title, then loop and stop at same level or parent level title
         const valueList: IElement[] = []
         let j = i
         while (j < elementList.length) {
@@ -2490,7 +2490,7 @@ export class CommandAdapt {
       tdValueIndex,
       zone
     } = positionContext
-    // 非直接命中或选区不一致时返回空值
+    // Return null if not directly hit or selection is inconsistent
     if (
       (isMustDirectHit && !isDirectHit) ||
       (zone && zone !== this.zone.getZone())
@@ -2516,7 +2516,7 @@ export class CommandAdapt {
       element = elementList[index] || null
       position = positionList[index] || null
     }
-    // 元素包围信息
+    // Element surrounding info
     let rangeRect: RangeRect | null = null
     if (position) {
       const {
@@ -2619,7 +2619,7 @@ export class CommandAdapt {
   }
 
   public locationArea(areaId: string, options?: ILocationAreaOption) {
-    // 区域在最后时，如果后面没有元素是否追加换行符
+    // When area is at end, whether to append line break if no element after
     if (
       options?.isAppendLastLineBreak &&
       options?.position === LocationPosition.OUTER_AFTER

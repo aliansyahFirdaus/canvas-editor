@@ -90,9 +90,9 @@ export default class Editor {
     data: IEditorData | IElement[],
     options: IEditorOption = {}
   ) {
-    // 合并配置
+    // Merge options
     const editorOptions = mergeOption(options)
-    // 数据处理
+    // Data processing
     data = deepClone(data)
     let headerElementList: IElement[] = []
     let mainElementList: IElement[] = []
@@ -117,15 +117,15 @@ export default class Editor {
         isForceCompensation: true
       })
     })
-    // 版本
+    // Version
     this.version = version
-    // 监听
+    // Listener
     this.listener = new Listener()
-    // 事件
+    // Event bus
     this.eventBus = new EventBus<EventBusMap>()
-    // 重写
+    // Override
     this.override = new Override()
-    // 启动
+    // Initialize draw
     const draw = new Draw(
       container,
       editorOptions,
@@ -139,32 +139,32 @@ export default class Editor {
       this.eventBus,
       this.override
     )
-    // 命令
+    // Command
     this.command = new Command(new CommandAdapt(draw))
-    // 菜单
+    // Context menu
     const contextMenu = new ContextMenu(draw, this.command)
-    // 快捷键
+    // Shortcut
     const shortcut = new Shortcut(draw, this.command)
-    // 注册
+    // Register
     this.register = new Register({
       contextMenu,
       shortcut,
       i18n: draw.getI18n()
     })
-    // 注册销毁方法
+    // Register destroy method
     this.destroy = () => {
       draw.destroy()
       shortcut.removeEvent()
       contextMenu.removeEvent()
       this.eventBus.dangerouslyClearAll()
     }
-    // 插件
+    // Plugin
     const plugin = new Plugin(this)
     this.use = plugin.use.bind(plugin)
   }
 }
 
-// 对外方法
+// Public methods
 export {
   splitText,
   createDomFromElementList,
@@ -172,7 +172,7 @@ export {
   getTextFromElementList
 }
 
-// 对外常量
+// Public constants
 export {
   EDITOR_COMPONENT,
   LETTER_CLASS,
@@ -181,7 +181,7 @@ export {
   EDITOR_CLIPBOARD
 }
 
-// 对外枚举
+// Public enums
 export {
   Editor,
   RowFlex,
@@ -220,7 +220,7 @@ export {
   WatermarkType
 }
 
-// 对外类型
+// Public types
 export type {
   IElement,
   IEditorData,
