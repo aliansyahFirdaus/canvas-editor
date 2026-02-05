@@ -7,20 +7,20 @@ import {
   TitleLevel
 } from './editor'
 
-const text = `主诉：\n发热三天，咳嗽五天。\n现病史：\n患者于三天前无明显诱因，感冒后发现面部水肿，无皮疹，尿量减少，出现乏力，在外治疗无好转，现来我院就诊。\n既往史：\n有糖尿病10年，有高血压2年，有传染性疾病1年。报告其他既往疾病。\n流行病史：\n否认14天内接触过确诊患者、疑似患者、无症状感染者及其密切接触者；否认14天内去过以下场所：水产、肉类批发市场，农贸市场，集市，大型超市，夜市；否认14天内与以下场所工作人员密切接触：水产、肉类批发市场，农贸市场，集市，大型超市；否认14天内周围（如家庭、办公室）有2例以上聚集性发病；否认14天内接触过有发热或呼吸道症状的人员；否认14天内自身有发热或呼吸道症状；否认14天内接触过纳入隔离观察的人员及其他可能与新冠肺炎关联的情形；陪同家属无以上情况。\n体格检查：\nT：39.5℃，P：80bpm，R：20次/分，BP：120/80mmHg；\n辅助检查：\n2020年6月10日，普放：血细胞比容36.50%（偏低）40～50；单核细胞绝对值0.75*10/L（偏高）参考值：0.1～0.6；\n门诊诊断：处置治疗：电子签名：【】\n其他记录：`
+const text = `Chief Complaint:\nFever for three days, cough for five days.\nHistory of Present Illness:\nPatient presented three days ago without obvious cause. After catching a cold, facial edema was discovered with no rash, decreased urine output, and fatigue. External treatment showed no improvement. Patient comes to our hospital for consultation.\nPast Medical History:\nDiabetes mellitus for 10 years, hypertension for 2 years, infectious disease for 1 year. Other past medical history reported.\nEpidemiology History:\nDenies contact with confirmed patients, suspected patients, asymptomatic carriers or close contacts within 14 days; denies visiting: seafood/meat wholesale markets, farmers markets, street markets, large supermarkets, night markets within 14 days; denies contact with workers from these locations within 14 days; denies clustering of 2 or more cases in surrounding areas (home, office) within 14 days; denies contact with fever or respiratory symptoms within 14 days; denies own fever or respiratory symptoms within 14 days; denies contact with isolated persons or other cases related to COVID-19 within 14 days; accompanying family members deny the above.\nPhysical Examination:\nT: 39.5℃, P: 80bpm, R: 20/min, BP: 120/80mmHg;\nAuxiliary Examination:\nJune 10, 2020, Plain film: Hematocrit 36.50% (low) 40-50%; Monocyte absolute value 0.75*10/L (high) Reference: 0.1-0.6;\nOutpatient Diagnosis: Treatment: Electronic Signature: [ ]\nOther Notes:`
 
 // Mock titles
 const titleText = [
-  '主诉：',
-  '现病史：',
-  '既往史：',
-  '流行病史：',
-  '体格检查：',
-  '辅助检查：',
-  '门诊诊断：',
-  '处置治疗：',
-  '电子签名：',
-  '其他记录：'
+  'Chief Complaint:',
+  'History of Present Illness:',
+  'Past Medical History:',
+  'Epidemiology History:',
+  'Physical Examination:',
+  'Auxiliary Examination:',
+  'Outpatient Diagnosis:',
+  'Treatment:',
+  'Electronic Signature:',
+  'Other Notes:'
 ]
 const titleMap: Map<number, string> = new Map()
 for (let t = 0; t < titleText.length; t++) {
@@ -32,7 +32,7 @@ for (let t = 0; t < titleText.length; t++) {
 }
 
 // Mock colored text
-const colorText = ['传染性疾病']
+const colorText = ['infectious disease']
 const colorIndex: number[] = colorText
   .map(b => {
     const i = text.indexOf(b)
@@ -45,7 +45,7 @@ const colorIndex: number[] = colorText
   .flat()
 
 // Mock highlighted text
-const highlightText = ['血细胞比容']
+const highlightText = ['Hematocrit']
 const highlightIndex: number[] = highlightText
   .map(b => {
     const i = text.indexOf(b)
@@ -105,7 +105,7 @@ elementList.splice(12, 0, {
     conceptId: '1',
     type: ControlType.TEXT,
     value: null,
-    placeholder: '其他补充',
+    placeholder: 'Other Comments',
     prefix: '{',
     postfix: '}'
   }
@@ -119,20 +119,20 @@ elementList.splice(94, 0, {
     type: ControlType.SELECT,
     value: null,
     code: null,
-    placeholder: '有无',
+    placeholder: 'Yes/No',
     prefix: '{',
     postfix: '}',
     valueSets: [
       {
-        value: '有',
+        value: 'Yes',
         code: '98175'
       },
       {
-        value: '无',
+        value: 'No',
         code: '98176'
       },
       {
-        value: '不详',
+        value: 'Unknown',
         code: '98177'
       }
     ]
@@ -144,19 +144,19 @@ elementList.splice(116, 0, {
   value: '',
   valueList: [
     {
-      value: '新',
+      value: 'COVID',
       size: 16
     },
     {
-      value: '冠',
+      value: '-',
       size: 16
     },
     {
-      value: '肺',
+      value: '1',
       size: 16
     },
     {
-      value: '炎',
+      value: '9',
       size: 16
     }
   ],
@@ -170,9 +170,9 @@ elementList.splice(335, 0, {
     conceptId: '6',
     type: ControlType.TEXT,
     value: null,
-    placeholder: '内容',
-    preText: '其他：',
-    postText: '。'
+    placeholder: 'Content',
+    preText: 'Other: ',
+    postText: '.'
   }
 })
 
@@ -193,7 +193,7 @@ elementList.splice(451, 0, {
   listType: ListType.OL,
   valueList: [
     {
-      value: '高血压\n糖尿病\n病毒性感冒\n过敏性鼻炎\n过敏性鼻息肉'
+      value: 'Hypertension\nDiabetes\nViral Infection\nAllergic Rhinitis\nNasal Polyps'
     }
   ]
 })
@@ -205,7 +205,7 @@ elementList.splice(453, 0, {
   valueList: [
     {
       value:
-        '超声引导下甲状腺细针穿刺术；\n乙型肝炎表面抗体测定；\n膜式病变细胞采集术、后颈皮下肤层；'
+        'Ultrasound-guided thyroid fine needle aspiration biopsy;\nHepatitis B surface antibody test;\nCytology collection, posterior neck subcutaneous layer;'
     }
   ]
 })
@@ -338,7 +338,7 @@ elementList.push({
 elementList.push(
   ...(<IElement[]>[
     {
-      value: '是否同意以上内容：'
+      value: 'Do you agree with the above content:'
     },
     {
       type: ElementType.CONTROL,
@@ -349,11 +349,11 @@ elementList.push(
         value: '',
         valueSets: [
           {
-            value: '同意',
+            value: 'Agree',
             code: '98175'
           },
           {
-            value: '否定',
+            value: 'Disagree',
             code: '98176'
           }
         ]
@@ -369,7 +369,7 @@ elementList.push(
 elementList.push(
   ...(<IElement[]>[
     {
-      value: '医学公式：'
+      value: 'Medical Formula:'
     },
     {
       value: `{E_k} = hv - {W_0}`,
@@ -384,7 +384,7 @@ elementList.push(
 elementList.push(
   ...(<IElement[]>[
     {
-      value: '签署日期：'
+      value: 'Signature Date:'
     },
     {
       type: ElementType.CONTROL,
@@ -397,7 +397,7 @@ elementList.push(
             value: `2022-08-10 17:30:01`
           }
         ],
-        placeholder: '签署日期'
+        placeholder: 'Signature Date'
       }
     },
     {
@@ -409,11 +409,11 @@ elementList.push(
 elementList.push(
   ...(<IElement[]>[
     {
-      value: '诊断标签：'
+      value: 'Diagnosis Label:'
     },
     {
       type: ElementType.LABEL,
-      value: '高血压',
+      value: 'Hypertension',
       labelId: 'l1',
       size: 14
     },
@@ -426,7 +426,7 @@ elementList.push(
 elementList.push(
   ...[
     {
-      value: '患者签名：'
+      value: 'Patient Signature:'
     },
     {
       type: ElementType.CONTROL,
@@ -448,7 +448,7 @@ elementList.push(
 elementList.push(
   ...[
     {
-      value: '\n就诊次数：'
+      value: '\nVisit Count:'
     },
     {
       type: ElementType.CONTROL,
@@ -457,7 +457,7 @@ elementList.push(
         conceptId: '7',
         type: ControlType.NUMBER,
         value: null,
-        placeholder: '就诊次数',
+        placeholder: 'Visit Count',
         prefix: '{',
         postfix: '}',
         numberExclusiveOptions: {
@@ -505,9 +505,9 @@ export const commentList: IComment[] = [
   {
     id: '1',
     content:
-      '红细胞比容（HCT）是指每单位容积中红细胞所占全血容积的比值，用于反映红细胞和血浆的比例。',
+      'Hematocrit (HCT) refers to the ratio of red blood cells to total blood volume per unit volume, used to reflect the proportion of red blood cells and plasma.',
     userName: 'Hufe',
-    rangeText: '血细胞比容',
+    rangeText: 'Hematocrit',
     createdDate: '2023-08-20 23:10:55'
   }
 ]
@@ -519,13 +519,13 @@ export const options: IEditorOption = {
     size: 120
   },
   pageNumber: {
-    format: '第{pageNo}页/共{pageCount}页'
+    format: 'Page {pageNo}/{pageCount}'
   },
   placeholder: {
-    data: '请输入正文'
+    data: 'Please enter body text'
   },
   zone: {
     tipDisabled: false
   },
-  maskMargin: [60, 0, 30, 0] // 菜单栏高度60，底部工具栏30为遮盖层
+  maskMargin: [60, 0, 30, 0] // Menu bar height 60, bottom toolbar 30 for masking layer
 }

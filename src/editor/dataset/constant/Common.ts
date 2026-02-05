@@ -6,20 +6,12 @@ export const HORIZON_TAB = '\t'
 export const NBSP = '\u0020'
 export const NON_BREAKING_SPACE = '&nbsp;'
 export const PUNCTUATION_LIST = [
-  '·',
-  '、',
   ':',
-  '：',
   ',',
-  '，',
   '.',
-  '。',
   ';',
-  '；',
   '?',
-  '？',
-  '!',
-  '！'
+  '!'
 ]
 
 export const maxHeightRadioMapping: Record<MaxHeightRatio, number> = {
@@ -41,4 +33,4 @@ export const LETTER_CLASS = {
   GREEK: 'ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσςΤτΥυΦφΧχΨψΩω'
 }
 
-export const METRICS_BASIS_TEXT = '中'
+export const METRICS_BASIS_TEXT = 'M'

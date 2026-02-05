@@ -54,7 +54,7 @@
   background-color: #e1e8ff;
 }
 
-/* 运算符按钮样式 */
+/* Operator button style */
 .ce-calculator-button.operator {
   background-color: #f5f7fa;
 }
@@ -63,7 +63,7 @@
   background-color: #EEF2FD;
 }
 
-/* 等号按钮样式 */
+/* Equals button style */
 .ce-calculator-button.equal {
   background-color: var(--COLOR-HOVER, #5175f4);
   color: #fff;
@@ -75,7 +75,7 @@
   border-color: var(--COLOR-HOVER, #6a84ff);
 }
 
-/* 功能按钮样式 */
+/* Function button style */
 .ce-calculator-button.utility {
   background-color: #f0f2f5;
 }

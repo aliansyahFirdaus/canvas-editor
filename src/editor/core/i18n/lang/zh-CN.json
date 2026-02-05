@@ -1,92 +1,92 @@
 {
   "contextmenu": {
     "global": {
-      "cut": "剪切",
-      "copy": "复制",
-      "paste": "粘贴",
-      "selectAll": "全选",
-      "print": "打印"
+      "cut": "Cut",
+      "copy": "Copy",
+      "paste": "Paste",
+      "selectAll": "Select All",
+      "print": "Print"
     },
     "control": {
-      "delete": "删除控件"
+      "delete": "Delete Control"
     },
     "hyperlink": {
-      "delete": "删除链接",
-      "cancel": "取消链接",
-      "edit": "编辑链接"
+      "delete": "Delete Hyperlink",
+      "cancel": "Cancel Hyperlink",
+      "edit": "Edit Hyperlink"
     },
     "image": {
-      "change": "更改图片",
-      "saveAs": "另存为图片",
-      "textWrap": "文字环绕",
+      "change": "Change Image",
+      "saveAs": "Save As Image",
+      "textWrap": "Text Wrapping",
       "textWrapType": {
-        "embed": "嵌入型",
-        "upDown": "上下型环绕",
-        "surround": "四周型环绕",
-        "floatTop": "浮于文字上方",
-        "floatBottom": "衬于文字下方"
+        "embed": "Inline",
+        "upDown": "Top and Bottom",
+        "surround": "Square",
+        "floatTop": "Float Over Text",
+        "floatBottom": "Float Below Text"
       }
     },
     "table": {
-      "insertRowCol": "插入行列",
-      "insertTopRow": "上方插入1行",
-      "insertBottomRow": "下方插入1行",
-      "insertLeftCol": "左侧插入1列",
-      "insertRightCol": "右侧插入1列",
-      "deleteRowCol": "删除行列",
-      "deleteRow": "删除1行",
-      "deleteCol": "删除1列",
-      "deleteTable": "删除整个表格",
-      "mergeCell": "合并单元格",
-      "mergeCancelCell": "取消合并",
-      "verticalAlign": "垂直对齐",
-      "verticalAlignTop": "顶端对齐",
-      "verticalAlignMiddle": "垂直居中",
-      "verticalAlignBottom": "底端对齐",
-      "border": "表格边框",
-      "borderAll": "所有框线",
-      "borderEmpty": "无框线",
-      "borderDash": "虚框线",
-      "borderExternal": "外侧框线",
-      "borderInternal": "内侧框线",
-      "borderTd": "单元格边框",
-      "borderTdTop": "上边框",
-      "borderTdRight": "右边框",
-      "borderTdBottom": "下边框",
-      "borderTdLeft": "左边框",
-      "borderTdForward": "正斜线",
-      "borderTdBack": "反斜线"
+      "insertRowCol": "Insert Row/Column",
+      "insertTopRow": "Insert Row Above",
+      "insertBottomRow": "Insert Row Below",
+      "insertLeftCol": "Insert Column Left",
+      "insertRightCol": "Insert Column Right",
+      "deleteRowCol": "Delete Row/Column",
+      "deleteRow": "Delete Row",
+      "deleteCol": "Delete Column",
+      "deleteTable": "Delete Table",
+      "mergeCell": "Merge Cells",
+      "mergeCancelCell": "Cancel Merge",
+      "verticalAlign": "Vertical Alignment",
+      "verticalAlignTop": "Align Top",
+      "verticalAlignMiddle": "Align Middle",
+      "verticalAlignBottom": "Align Bottom",
+      "border": "Table Border",
+      "borderAll": "All Borders",
+      "borderEmpty": "No Border",
+      "borderDash": "Dashed Border",
+      "borderExternal": "Outer Border",
+      "borderInternal": "Inner Border",
+      "borderTd": "Cell Border",
+      "borderTdTop": "Top Border",
+      "borderTdRight": "Right Border",
+      "borderTdBottom": "Bottom Border",
+      "borderTdLeft": "Left Border",
+      "borderTdForward": "Forward Slash",
+      "borderTdBack": "Back Slash"
     }
   },
   "datePicker": {
-    "now": "此刻",
-    "confirm": "确定",
-    "return": "返回日期",
-    "timeSelect": "时间选择",
+    "now": "Now",
+    "confirm": "Confirm",
+    "return": "Return Date",
+    "timeSelect": "Time Select",
     "weeks": {
-      "sun": "日",
-      "mon": "一",
-      "tue": "二",
-      "wed": "三",
-      "thu": "四",
-      "fri": "五",
-      "sat": "六"
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
     },
-    "year": "年",
-    "month": "月",
-    "hour": "时",
-    "minute": "分",
-    "second": "秒"
+    "year": "Year",
+    "month": "Month",
+    "hour": "Hour",
+    "minute": "Minute",
+    "second": "Second"
   },
   "frame": {
-    "header": "页眉",
-    "footer": "页脚"
+    "header": "Header",
+    "footer": "Footer"
   },
   "pageBreak": {
-    "displayName": "分页符"
+    "displayName": "Page Break"
   },
   "zone": {
-    "headerTip": "双击编辑页眉",
-    "footerTip": "双击编辑页脚"
+    "headerTip": "Double-click to edit header",
+    "footerTip": "Double-click to edit footer"
   }
 }

@@ -3,7 +3,6 @@ import { NumberType } from '../../../dataset/enum/Common'
 import { RowFlex } from '../../../dataset/enum/Row'
 import { DeepRequired } from '../../../interface/Common'
 import { IEditorOption } from '../../../interface/Editor'
-import { convertNumberToChinese } from '../../../utils'
 import { Draw } from '../Draw'
 
 export class PageNumber {
@@ -19,12 +18,9 @@ export class PageNumber {
     text: string,
     pageNo: number,
     replaceReg: RegExp,
-    numberType: NumberType
+    _numberType: NumberType
   ) {
-    const pageNoText =
-      numberType === NumberType.CHINESE
-        ? convertNumberToChinese(pageNo)
-        : `${pageNo}`
+    const pageNoText = `${pageNo}`
     return text.replace(replaceReg, pageNoText)
   }
 
